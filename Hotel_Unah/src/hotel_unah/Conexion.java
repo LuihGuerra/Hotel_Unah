@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
  */
 public class Conexion {
     
-
     
     private Conexion(){}
     //establecer credenciales
@@ -24,33 +23,23 @@ public class Conexion {
     
     private static Conexion instancia;
     
-    private static final String url = "jdbc:mysql://localhost/hotel_unah";
+    private static final String HOST = "localhost";
+    private static final String USER = "admin"; 
+    private static final String PORT = "3306";
+    private static final String PWD = "@Xel0501200209630";
+    private static final String BD = "hotel_unah";
     
-    private static final String user = "root";
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + BD;
     
-    private static final String password = "";
-    
-    //establecer conexion
-    
-    public Connection conectar(){
+    public static Connection conectar(){
+        Connection conn = null;
         try{
-            
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            
-            conn=DriverManager.getConnection(url,user,password);
-            
-            //JOptionPane.showMessageDialog(null, "Conexion Exitosa !!");
-            
-            return conn;
+            conn = DriverManager.getConnection(URL,USER, PWD);
         
-        }catch(Exception e){
-        
-            JOptionPane.showMessageDialog(null,"Error: "+ e);
-        
+        }catch(SQLException ex){
+            System.out.println(ex.getMessage());
         }
-        
         return conn;
-        
     }
     
     //cerrar conexion
