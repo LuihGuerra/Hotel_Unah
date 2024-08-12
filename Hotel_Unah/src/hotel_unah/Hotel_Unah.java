@@ -4,6 +4,9 @@
  */
 package hotel_unah;
 
+
+
+
 /**
  *
  * @author Luih
@@ -13,12 +16,17 @@ public class Hotel_Unah {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args){
         // TODO code application logic here
         
         Main_Hotel ventana_principal = new Main_Hotel();
         
         ventana_principal.setVisible(true);
+        
+        
+               
+                   
+            
     }
     
 }
