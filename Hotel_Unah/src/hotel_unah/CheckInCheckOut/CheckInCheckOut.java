@@ -250,6 +250,19 @@ public class CheckInCheckOut {
         }
     
     }
+        public void finalizarReserva(String reservaId){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET reservas.estado ='finalizada' WHERE reservas.id=?;"); 
+            actualizar.setString(1, reservaId);
+            actualizar.executeUpdate();
+            conn.cerrarConexion();
+            
+            
+        } catch (SQLException e) {
+        }
+}
     public void cambiarEstadoHabitacionLimpieza(String habitacionId){
         try {
             Conexion conn = Conexion.getInstance();
