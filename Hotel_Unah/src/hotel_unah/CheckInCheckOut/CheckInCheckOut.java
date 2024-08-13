@@ -115,7 +115,8 @@ public class CheckInCheckOut {
         Conexion conn = Conexion.getInstance();
         Connection conexion = conn.conectar();
         
-        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE reserva_id = '"+txtBuscarCkeckin.getText().trim()+"'");
+        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE reserva_id = ?");
+        consulta.setString(1, txtBuscarCkeckin.getText().trim());
         ResultSet resultado = consulta.executeQuery();
         
             
@@ -143,11 +144,13 @@ public class CheckInCheckOut {
                     JOptionPane.showMessageDialog(null, "Reserva Dentro de tiempo");
                     Conexion conn = Conexion.getInstance();
                     Connection conexion = conn.conectar();
-                    PreparedStatement insertar = conexion.prepareStatement("INSERT INTO checkins( reserva_id, fecha_checkin) VALUES ('"+reservaId+ "',CURRENT_TIMESTAMP())");     
+                    PreparedStatement insertar = conexion.prepareStatement("INSERT INTO checkins( reserva_id, fecha_checkin) VALUES (?,CURRENT_TIMESTAMP())"); 
+                    insertar.setString(1, reservaId);
                     insertar.executeUpdate();
                     JOptionPane.showMessageDialog(null, "Checkin Realizado con Exito");
                     actualizarCheckIn(tblCheckin);
                     conn.cerrarConexion();
+                    
                     
             }else{
                    JOptionPane.showMessageDialog(null, "Reserva Fuera de tiempo");                
@@ -163,7 +166,8 @@ public class CheckInCheckOut {
         Conexion conn = Conexion.getInstance();
         Connection conexion = conn.conectar();
         
-        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkouts WHERE checkin_id = '"+txtBuscarCheckout.getText().trim()+"'");
+        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkouts WHERE checkin_id = ?");
+        consulta.setString(1, txtBuscarCheckout.getText().trim());
         ResultSet resultado = consulta.executeQuery();
         
             
@@ -185,7 +189,8 @@ public class CheckInCheckOut {
        try {
            Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-             PreparedStatement consulta = conexion.prepareStatement("INSERT INTO checkouts(checkin_id, fecha_checkout) VALUES ('"+checkInId+"',CURRENT_TIMESTAMP());");
+             PreparedStatement consulta = conexion.prepareStatement("INSERT INTO checkouts(checkin_id, fecha_checkout) VALUES (?,CURRENT_TIMESTAMP());");
+             consulta.setString(1, checkInId);
              consulta.executeUpdate();
              actualizarCheckOut(tblCheckout);
              JOptionPane.showMessageDialog(null, "Check out realizado correctamente");
@@ -197,7 +202,8 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE checkins.id = '"+txtBuscarCheckout.trim()+"'");
+             PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE checkins.id = ?");
+            consulta.setString(1, txtBuscarCheckout);
         ResultSet resultado = consulta.executeQuery();
         
             
@@ -230,7 +236,8 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN checkins ON reservas.id=checkins.reserva_id WHERE checkins.reserva_id='"+reservasId+"'");
+            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN checkins ON reservas.id=checkins.reserva_id WHERE checkins.reserva_id=?");
+            consulta.setString(1, reservasId);
             ResultSet resultado= consulta.executeQuery();
             if (resultado.next()) {
                 cambiarEstadoHabitacionLimpieza(resultado.getString(3));
@@ -247,7 +254,8 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='en limpieza' WHERE id='"+habitacionId.trim()+ "';"); 
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='en limpieza' WHERE id=?;"); 
+            actualizar.setString(1, habitacionId);
             actualizar.executeUpdate();
             conn.cerrarConexion();
             
@@ -261,7 +269,8 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='ocupada' WHERE id='"+habitacion_id.trim()+ "';"); 
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='ocupada' WHERE id=?;"); 
+            actualizar.setString(1, habitacion_id);  
             actualizar.executeUpdate();
             conn.cerrarConexion();
             
@@ -274,7 +283,8 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET estado ='confirmada' WHERE id='"+reservaId+ "';"); 
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET estado ='confirmada' WHERE id='?;"); 
+            actualizar.setString(1, reservaId);
             actualizar.executeUpdate();
             conn.cerrarConexion();
             
@@ -288,7 +298,8 @@ public class CheckInCheckOut {
             Connection conexion = conn.conectar();
              
             //PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas WHERE id = '"+txtBuscarCkeckin.getText().trim()+"'");  
-            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id='"+txtBuscarCkeckin.getText().trim()+"'"); 
+           PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=?"); 
+            busqueda.setString(1, txtBuscarCkeckin.getText().trim()); 
             ResultSet consulta = busqueda.executeQuery();
                            
             if (consulta.next()) {
