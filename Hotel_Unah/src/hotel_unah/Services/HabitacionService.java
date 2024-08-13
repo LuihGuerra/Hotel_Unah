@@ -17,8 +17,10 @@ import java.sql.ResultSet;
  *
  * @author axel2
  */
-public class HabitacionService {
-   public List<Habitacion> getHabitaciones(){
+    public class HabitacionService {
+        
+        
+    public List<Habitacion> getHabitaciones(){
         Connection con = Conexion.conectar();
         System.out.println(con);
         List<Habitacion> habitaciones = new ArrayList();
@@ -62,7 +64,7 @@ public class HabitacionService {
             stmt.setDouble(4, habitacion.PrecioPorNoche);
             int rowsAffected  = stmt.executeUpdate();
             
-            if(rowsAffected >= 0)
+            if(rowsAffected > 0)
             {
                result.Success(true, "200", "Habitacion agregada con exito");
             }else{
@@ -94,7 +96,7 @@ public class HabitacionService {
             stmt.setInt(5,  habitacion.HabitacionId);
             int rowsAffected  = stmt.executeUpdate();
             
-            if(rowsAffected >= 0)
+            if(rowsAffected > 0)
             {
                result.Success(true, "200", "Habitacion actualizada con exito");
             }else{
@@ -122,7 +124,7 @@ public class HabitacionService {
             stmt.setInt(1, habitacionId);
             int rowsAffected  = stmt.executeUpdate();
             
-            if(rowsAffected >= 0)
+            if(rowsAffected > 0)
             {
                result.Success(true, "200", "Habitacion eliminada con exito");
             }else{
