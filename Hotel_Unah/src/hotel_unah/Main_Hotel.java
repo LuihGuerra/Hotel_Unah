@@ -592,17 +592,144 @@ public class Main_Hotel extends javax.swing.JFrame {
     /*-------------------------------------------------------------------------
                                 GESTION DE RESERVAS
     -------------------------------------------------------------------------*/
-    public void actualizar_tabla_reservas() {
-
+   
+    /*-------------------------------------------------------------------------
+                                    CREATE
+    -------------------------------------------------------------------------*/
+    public void agregarReserva(java.sql.Date fechaEntrada, java.sql.Date fechaSalida, int clienteId, int habitacionId, String estado) {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
 
-            PreparedStatement llenarTabla = conexion.prepareStatement("SELECT * FROM reservas");
-            ResultSet consulta = llenarTabla.executeQuery();
+            String query = "INSERT INTO reservas (cliente_id, habitacion_id, fecha_entrada, fecha_salida, estado) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement ps = conexion.prepareStatement(query);
+
+            ps.setInt(1, clienteId);
+            ps.setInt(2, habitacionId);
+            ps.setDate(3, fechaEntrada);
+            ps.setDate(4, fechaSalida);
+            ps.setString(5, estado);
+
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Reserva agregada correctamente");
+
+            actualizar_tabla_reservas();
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al agregar la reserva: " + e.getMessage());
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+                                    READ
+    -------------------------------------------------------------------------*/
+    public void cargarReservas() {
+        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
+        model.setRowCount(0);
+        try {
+            List<Reserva> reservas = obtenerReservas();
+            for (Reserva reserva : reservas) {
+                model.addRow(new Object[]{
+                    reserva.getId(),
+                    reserva.getClienteId(),
+                    reserva.getHabitacionId(),
+                    reserva.getFechaEntrada(),
+                    reserva.getFechaSalida(),
+                    reserva.getEstado()
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
+        }
+    }
+
+    private List<Reserva> obtenerReservas() throws SQLException {
+        List<Reserva> reservas = new ArrayList<>();
+        String query = "SELECT * FROM reservas";
+
+        try (Connection conexion = Conexion.getInstance().conectar();
+             PreparedStatement stmt = conexion.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                reservas.add(new Reserva(
+                    rs.getInt("id"),
+                    rs.getInt("cliente_id"),
+                    rs.getInt("habitacion_id"),
+                    rs.getDate("fecha_entrada"),
+                    rs.getDate("fecha_salida"),
+                    rs.getString("estado")
+                ));
+            }
+        }
+
+        return reservas;
+    }
+
+    /*-------------------------------------------------------------------------
+                                    UPDATE
+    -------------------------------------------------------------------------*/
+    public void modificarReserva(int idReserva, java.sql.Date nuevaFechaEntrada, java.sql.Date nuevaFechaSalida, int nuevoClienteId, int nuevaHabitacionId, String nuevoEstado) {
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+
+            String query = "UPDATE reservas SET fecha_entrada = ?, fecha_salida = ?, cliente_id = ?, habitacion_id = ?, estado = ? WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(query);
+
+            ps.setDate(1, nuevaFechaEntrada);
+            ps.setDate(2, nuevaFechaSalida);
+            ps.setInt(3, nuevoClienteId);
+            ps.setInt(4, nuevaHabitacionId);
+            ps.setString(5, nuevoEstado);
+            ps.setInt(6, idReserva);
+
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Reserva actualizada correctamente");
+
+            actualizar_tabla_reservas();
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al actualizar la reserva: " + e.getMessage());
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+                                    DELETE
+    -------------------------------------------------------------------------*/
+    public void eliminarReserva(int idReserva) {
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+
+            String query = "DELETE FROM reservas WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(query);
+
+            ps.setInt(1, idReserva);
+
+            int respuesta = JOptionPane.showConfirmDialog(this, "¿Quieres eliminar esta reserva?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Reserva eliminada correctamente");
+                actualizar_tabla_reservas();
+            }
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al eliminar la reserva: " + e.getMessage());
+        }
+    }
+
+    public void actualizar_tabla_reservas() {
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+
+            String query = "SELECT * FROM reservas";
+            PreparedStatement stmt = conexion.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
             modelo1 = new DefaultTableModel() {
-                //deshabilitar la edición de las filas
+                @Override
                 public boolean isCellEditable(int row, int col) {
                     return false;
                 }
@@ -615,58 +742,60 @@ public class Main_Hotel extends javax.swing.JFrame {
             modelo1.addColumn("fecha_salida");
             modelo1.addColumn("estado");
 
-            tablaReservas.setModel(modelo1);
+            tblReservas.setModel(modelo1);
 
-            while (consulta.next()) {
-                Vector fila = new Vector();
-                fila.addElement(consulta.getString(1));
-                fila.addElement(consulta.getString(2));
-                fila.addElement(consulta.getString(3));
-                fila.addElement(consulta.getString(4));
-                fila.addElement(consulta.getString(5));
-                fila.addElement(consulta.getString(6));
+            while (rs.next()) {
+                Vector<Object> fila = new Vector<>();
+                fila.add(rs.getInt("id"));
+                fila.add(rs.getInt("cliente_id"));
+                fila.add(rs.getInt("habitacion_id"));
+                fila.add(rs.getDate("fecha_entrada"));
+                fila.add(rs.getDate("fecha_salida"));
+                fila.add(rs.getString("estado"));
                 modelo1.addRow(fila);
             }
+
             conn.cerrarConexion();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Error al actualizar la tabla de reservas: " + e.getMessage());
         }
     }
-    
-    public void agregarReservaATabla(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
-    // Convertir las fechas a un formato legible, si es necesario
-    String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
-    String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
 
-    // Añadir una nueva fila a la tabla con los detalles de la reserva
-    DefaultTableModel model = (DefaultTableModel) tablaReservas.getModel();
-    model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
+    public void agregarReservaATabla(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
+        String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
+        String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
+
+        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
+        model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
     }
-    
+
     public void cancelar_reservas() {
-        Conexion conn = Conexion.getInstance();
         try {
-            if (tablaReservas.getSelectedRow() == -1) {
+            if (tblReservas.getSelectedRow() == -1) {
                 return;
             }
+            Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement cancelar = conexion.prepareStatement("DELETE FROM reservas WHERE id = ? ");
 
-            Vector registro;
-            registro = (Vector) modelo1.getDataVector().elementAt(tablaReservas.getSelectedRow());
-            String id_ReservaCancelar = registro.elementAt(0).toString().trim();
+            String query = "DELETE FROM reservas WHERE id = ?";
+            PreparedStatement ps = conexion.prepareStatement(query);
 
-            int respuesta = JOptionPane.showConfirmDialog(this, "Quieres cancelar este reserva?","YES_NO_OPTION", JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
-            if (respuesta == 0) {
-                cancelar.setString(1, id_ReservaCancelar);
-                cancelar.executeUpdate();
+            Vector registro = (Vector) modelo1.getDataVector().elementAt(tblReservas.getSelectedRow());
+            int idReservaCancelar = (Integer) registro.elementAt(0);
+
+            int respuesta = JOptionPane.showConfirmDialog(this, "¿Quieres cancelar esta reserva?", "Confirmar Cancelación", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                ps.setInt(1, idReservaCancelar);
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Reserva cancelada correctamente");
                 actualizar_tabla_reservas();
             }
             conn.cerrarConexion();
         } catch (HeadlessException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "No se puede cancelar esta reserva porque eso interfiere con la integridad de los datos :) ");
+            JOptionPane.showMessageDialog(null, "Error al cancelar la reserva: " + e.getMessage());
         }
     }
+
     
     
     
