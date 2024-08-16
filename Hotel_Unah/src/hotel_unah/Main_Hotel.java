@@ -592,7 +592,7 @@ public class Main_Hotel extends javax.swing.JFrame {
     /*-------------------------------------------------------------------------
                                 GESTION DE RESERVAS
     -------------------------------------------------------------------------*/
-   
+
     /*-------------------------------------------------------------------------
                                     CREATE
     -------------------------------------------------------------------------*/
@@ -625,100 +625,46 @@ public class Main_Hotel extends javax.swing.JFrame {
     -------------------------------------------------------------------------*/
     public void cargarReservas() {
         DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
-        model.setRowCount(0);
-        try {
-            List<Reserva> reservas = obtenerReservas();
-            for (Reserva reserva : reservas) {
-                model.addRow(new Object[]{
-                    reserva.getId(),
-                    reserva.getClienteId(),
-                    reserva.getHabitacionId(),
-                    reserva.getFechaEntrada(),
-                    reserva.getFechaSalida(),
-                    reserva.getEstado()
-                });
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
+    model.setRowCount(0);
+    try {
+        List<Reserva> reservas = obtenerReservas();
+        for (Reserva reserva : reservas) {
+            model.addRow(new Object[]{
+                reserva.getId(),
+                reserva.getFechaEntrada(),
+                reserva.getFechaSalida(),
+                reserva.getEstado()
+            });
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
+    }
+}
+
+private List<Reserva> obtenerReservas() throws SQLException {
+    List<Reserva> reservas = new ArrayList<>();
+    String query = "SELECT * FROM reservas";
+
+    try (Connection conexion = Conexion.getInstance().conectar();
+         PreparedStatement stmt = conexion.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            reservas.add(new Reserva(
+                rs.getInt("id"),
+                rs.getTimestamp("fecha_entrada"),
+                rs.getTimestamp("fecha_salida"),
+                rs.getString("estado")
+            ));
         }
     }
 
-    private List<Reserva> obtenerReservas() throws SQLException {
-        List<Reserva> reservas = new ArrayList<>();
-        String query = "SELECT * FROM reservas";
-
-        try (Connection conexion = Conexion.getInstance().conectar();
-             PreparedStatement stmt = conexion.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                reservas.add(new Reserva(
-                    rs.getInt("id"),
-                    rs.getInt("cliente_id"),
-                    rs.getInt("habitacion_id"),
-                    rs.getDate("fecha_entrada"),
-                    rs.getDate("fecha_salida"),
-                    rs.getString("estado")
-                ));
-            }
-        }
-
-        return reservas;
+    return reservas;
     }
-
-    /*-------------------------------------------------------------------------
+    
+   /*-------------------------------------------------------------------------
                                     UPDATE
-    -------------------------------------------------------------------------*/
-    public void modificarReserva(int idReserva, java.sql.Date nuevaFechaEntrada, java.sql.Date nuevaFechaSalida, int nuevoClienteId, int nuevaHabitacionId, String nuevoEstado) {
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "UPDATE reservas SET fecha_entrada = ?, fecha_salida = ?, cliente_id = ?, habitacion_id = ?, estado = ? WHERE id = ?";
-            PreparedStatement ps = conexion.prepareStatement(query);
-
-            ps.setDate(1, nuevaFechaEntrada);
-            ps.setDate(2, nuevaFechaSalida);
-            ps.setInt(3, nuevoClienteId);
-            ps.setInt(4, nuevaHabitacionId);
-            ps.setString(5, nuevoEstado);
-            ps.setInt(6, idReserva);
-
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Reserva actualizada correctamente");
-
-            actualizar_tabla_reservas();
-            conn.cerrarConexion();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar la reserva: " + e.getMessage());
-        }
-    }
-
-    /*-------------------------------------------------------------------------
-                                    DELETE
-    -------------------------------------------------------------------------*/
-    public void eliminarReserva(int idReserva) {
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "DELETE FROM reservas WHERE id = ?";
-            PreparedStatement ps = conexion.prepareStatement(query);
-
-            ps.setInt(1, idReserva);
-
-            int respuesta = JOptionPane.showConfirmDialog(this, "¿Quieres eliminar esta reserva?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Reserva eliminada correctamente");
-                actualizar_tabla_reservas();
-            }
-            conn.cerrarConexion();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al eliminar la reserva: " + e.getMessage());
-        }
-    }
-
+    -------------------------------------------------------------------------*/  
     public void actualizar_tabla_reservas() {
         try {
             Conexion conn = Conexion.getInstance();
@@ -749,8 +695,8 @@ public class Main_Hotel extends javax.swing.JFrame {
                 fila.add(rs.getInt("id"));
                 fila.add(rs.getInt("cliente_id"));
                 fila.add(rs.getInt("habitacion_id"));
-                fila.add(rs.getDate("fecha_entrada"));
-                fila.add(rs.getDate("fecha_salida"));
+                fila.add(rs.getTimestamp("fecha_entrada"));
+                fila.add(rs.getTimestamp("fecha_salida"));
                 fila.add(rs.getString("estado"));
                 modelo1.addRow(fila);
             }
@@ -761,14 +707,16 @@ public class Main_Hotel extends javax.swing.JFrame {
         }
     }
 
-    public void agregarReservaATabla(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
+    public void agregarReservaATabla(java.sql.Timestamp fechaEntrada, java.sql.Timestamp fechaSalida) {
         String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
         String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
 
         DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
         model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
     }
-
+/*-------------------------------------------------------------------------
+                                    DELETE
+    -------------------------------------------------------------------------*/
     public void cancelar_reservas() {
         try {
             if (tblReservas.getSelectedRow() == -1) {
@@ -796,9 +744,6 @@ public class Main_Hotel extends javax.swing.JFrame {
         }
     }
 
-    
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
