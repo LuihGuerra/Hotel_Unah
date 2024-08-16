@@ -7,7 +7,8 @@ package hotel_unah;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
+import java.sql.Timestamp;
+//import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
@@ -29,43 +30,46 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     }
     
     private void guardarReserva() {
-    //Solo guarda la fecha, quedan pendientes los demas datos.   
-    Date fechaSeleccionadaEntrada = fechaEnt.getDate();
-    Date fechaSeleccionadaSalida = fechaSal.getDate();
-    
-    java.sql.Date sqlDateEntrada = new java.sql.Date(fechaSeleccionadaEntrada.getTime());
-    java.sql.Date sqlDateSalida = new java.sql.Date(fechaSeleccionadaSalida.getTime());
-    
-    mainHotel.agregarReservaATabla(sqlDateEntrada, sqlDateSalida);
-    guardarReservaEnBaseDeDatos(sqlDateEntrada, sqlDateSalida);
+    try {
+            // Obtiene las fechas de entrada y salida desde los campos de texto
+            Timestamp fechaSeleccionadaEntrada = Timestamp.valueOf(txtFechaEntrada.getText());
+            Timestamp fechaSeleccionadaSalida = Timestamp.valueOf(txtFechaSalida.getText());
+
+            // Agrega la reserva a la tabla y guarda en la base de datos
+            mainHotel.agregarReservaATabla(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
+            guardarReservaEnBaseDeDatos(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
+
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: yyyy-MM-dd HH:mm:ss", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 }
     
-    private void guardarReservaEnBaseDeDatos(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
-    Connection conexion = null;
-    PreparedStatement pstmt = null;
-    
-    try {
-        Conexion conn = Conexion.getInstance();
-        conexion = conn.conectar();
-        String sql = "INSERT INTO RESERVAS (fecha_entrada, fecha_salida) VALUES (?, ?)";
-        pstmt = conexion.prepareStatement(sql);
-        pstmt.setDate(1, fechaEntrada);
-        pstmt.setDate(2, fechaSalida);  // Añadir fecha_salida aquí
-        pstmt.executeUpdate();
+    private void guardarReservaEnBaseDeDatos(Timestamp fechaEntrada, Timestamp fechaSalida) {
+        Connection conexion = null;
+        PreparedStatement pstmt = null;
 
-        JOptionPane.showMessageDialog(this, "Reserva guardada exitosamente");
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al guardar la reserva: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-    } finally {
         try {
-            if (pstmt != null) pstmt.close();
-            if (conexion != null) conexion.close();
+            Conexion conn = Conexion.getInstance();
+            conexion = conn.conectar();
+            String sql = "INSERT INTO RESERVAS (fecha_entrada, fecha_salida) VALUES (?, ?)";
+            pstmt = conexion.prepareStatement(sql);
+            pstmt.setTimestamp(1, fechaEntrada);
+            pstmt.setTimestamp(2, fechaSalida);
+            pstmt.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Reserva guardada exitosamente");
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al cerrar la conexión: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al guardar la reserva: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+                if (conexion != null) conexion.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error al cerrar la conexión: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
-    }
     }
 
     /**
