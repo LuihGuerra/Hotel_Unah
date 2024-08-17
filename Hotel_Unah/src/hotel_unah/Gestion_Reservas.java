@@ -40,7 +40,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
             guardarReservaEnBaseDeDatos(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
 
         } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: yyyy-MM-dd HH:mm:ss", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: YYYY-MM-DD HH:MM:SS", "Error", JOptionPane.ERROR_MESSAGE);
         }
 }
     
