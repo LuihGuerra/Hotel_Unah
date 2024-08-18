@@ -627,7 +627,7 @@ public class Main_Hotel extends javax.swing.JFrame {
     public void cargarReservas() {
         DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
     model.setRowCount(0);
-    try {
+   /* try {
         List<Reserva> reservas = obtenerReservas();
         for (Reserva reserva : reservas) {
             model.addRow(new Object[]{
@@ -639,10 +639,10 @@ public class Main_Hotel extends javax.swing.JFrame {
         }
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
-    }
+    }*/
 }
 
-private List<Reserva> obtenerReservas() throws SQLException {
+/*private List<Reserva> obtenerReservas() throws SQLException {
     List<Reserva> reservas = new ArrayList<>();
     String query = "SELECT * FROM reservas";
 
@@ -662,7 +662,7 @@ private List<Reserva> obtenerReservas() throws SQLException {
 
     return reservas;
     }
-    
+    */
    /*-------------------------------------------------------------------------
                                     UPDATE
     -------------------------------------------------------------------------*/  
