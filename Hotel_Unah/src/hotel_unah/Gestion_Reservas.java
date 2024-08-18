@@ -32,8 +32,8 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     private void guardarReserva() {
     try {
             // Obtiene las fechas de entrada y salida desde los campos de texto
-            Timestamp fechaSeleccionadaEntrada = Timestamp.valueOf(txtFechaEntrada.getText());
-            Timestamp fechaSeleccionadaSalida = Timestamp.valueOf(txtFechaSalida.getText());
+            Timestamp fechaSeleccionadaEntrada = Timestamp.valueOf(fechaEnt.getDate().toString());
+            Timestamp fechaSeleccionadaSalida = Timestamp.valueOf(fechaSal.getDate().toString());
 
             // Agrega la reserva a la tabla y guarda en la base de datos
             mainHotel.agregarReservaATabla(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
