@@ -40,8 +40,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
             guardarReservaEnBaseDeDatos(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
 
         } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: YYYY-MM-DD HH:MM:SS", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+             JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: YYYY-MM-DD HH:MM:SS", "Error", JOptionPane.ERROR_MESSAGE);}
 }
     
     private void guardarReservaEnBaseDeDatos(Timestamp fechaEntrada, Timestamp fechaSalida) {
@@ -199,7 +198,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                         .addComponent(btnAgregarReserva)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSalir)))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(216, 216, 216)
@@ -258,6 +257,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed

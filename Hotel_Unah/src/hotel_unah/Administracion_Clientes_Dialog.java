@@ -4,24 +4,25 @@
  */
 package hotel_unah;
 
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
-import javax.swing.JDialog;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
  * @author Luih
  */
 public class Administracion_Clientes_Dialog extends javax.swing.JDialog {
-
+DefaultTableModel modelo = new DefaultTableModel();
     /**
      * Creates new form Administracion_Clientes_Dialog
      */
@@ -111,7 +112,111 @@ public void buscarDni(String dni) {
     }
 
 
+    public void actualizar_tabla_clientes(JTable tblClientes) {
 
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+
+            PreparedStatement llenarTabla = conexion.prepareStatement("SELECT * FROM clientes");
+
+            ResultSet consulta = llenarTabla.executeQuery();
+
+            modelo = new DefaultTableModel() {
+
+                //deshabilitar la edición de las filas
+                public boolean isCellEditable(int row, int col) {
+                    return false;
+                }
+
+            };
+
+            modelo.addColumn("id");
+            modelo.addColumn("nombre");
+            modelo.addColumn("direccion");
+            modelo.addColumn("telefono");
+            modelo.addColumn("email");
+            modelo.addColumn("dni");
+
+            tblClientes.setModel(modelo);
+
+            while (consulta.next()) {
+                Vector fila = new Vector();
+
+                fila.addElement(consulta.getString(1));
+                fila.addElement(consulta.getString(2));
+                fila.addElement(consulta.getString(3));
+                fila.addElement(consulta.getString(4));
+                fila.addElement(consulta.getString(5));
+                fila.addElement(consulta.getString(6));
+
+                modelo.addRow(fila);
+            }
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+    } 
+    public void OcultarBotonModificar(){
+        
+        btnGuardarClientesModificar.setVisible(false);
+       
+    }
+    public void OcultarBotonGuardar(){
+        //Dimension d = new Dimension();
+        //d.height=40;
+        //d.width=500;
+        btnGuardarClientes.setVisible(false);
+        //btnGuardarClientesModificar.setPreferredSize(d);
+    }
+    public void modificar_cliente(String id_ClienteModificar) {
+        
+        
+       
+        
+        Conexion conn = Conexion.getInstance();
+        
+
+        
+             
+        try {
+
+            Connection conexion = conn.conectar();
+
+            PreparedStatement modificar = conexion.prepareStatement
+                    ("UPDATE clientes SET "
+                    + "nombre='"+getNombre_Cliente()+"',"
+                    + "direccion='"+getDireccion_Cliente()+"',"
+                    + "telefono='"+getTelefono_Cliente()+"',"
+                    + "email='"+getEmail_Cliente()+"',"
+                    + "dni='"+getDni_Cliente()+"' "
+                    + "WHERE id='"+id_ClienteModificar+"';");
+
+            
+           
+                Object [] opciones = {"SI", "NO"};
+                int respuesta = JOptionPane.showOptionDialog(this, "Desea modificar al Cliente?","Modificar Cliente" ,JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,null, opciones, opciones[1]);
+                if (respuesta==-1) {
+                     //Por si hace cosas raras el boton "x"
+                }else{
+               if (respuesta==0) {
+                modificar.executeUpdate();
+            
+            JOptionPane.showMessageDialog(null, "Cliente Modificado Correctamente");
+
+            
+            conn.cerrarConexion();
+               this.dispose();
+               }else{return;}}
+
+           
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "No se puede modificar este cliente porque eso interfiere con la integridad de los datos "+e);
+        }
+        
+    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -131,8 +236,15 @@ public void buscarDni(String dni) {
         lblCliente = new javax.swing.JLabel();
         btnGuardarClientes = new javax.swing.JButton();
         btnCancelarClientes = new javax.swing.JButton();
+        btnGuardarClientesModificar = new javax.swing.JButton();
+        txtId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         lblAdministracionClientes.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblAdministracionClientes.setText("Administración de Clientes");
@@ -154,17 +266,35 @@ public void buscarDni(String dni) {
 
         txtNombre.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtNombre.setName("Gestion De Clientes"); // NOI18N
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
 
         txtDni.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtDni.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtDniFocusLost(evt);
+            }
+        });
         txtDni.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtDniKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDniKeyTyped(evt);
             }
         });
 
         txtDireccion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         txtTelefono.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtTelefono.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtTelefonoKeyTyped(evt);
+            }
+        });
 
         txtEmail.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -187,48 +317,65 @@ public void buscarDni(String dni) {
             }
         });
 
+        btnGuardarClientesModificar.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btnGuardarClientesModificar.setText("Guardar");
+        btnGuardarClientesModificar.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                btnGuardarClientesModificarStateChanged(evt);
+            }
+        });
+        btnGuardarClientesModificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarClientesModificarActionPerformed(evt);
+            }
+        });
+
+        txtId.setText("0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(91, 91, 91)
+                .addComponent(lblAdministracionClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(45, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblCliente, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGap(56, 56, 56)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(45, 45, 45)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(56, 56, 56)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(61, 61, 61)
-                                .addComponent(btnGuardarClientes)
-                                .addGap(53, 53, 53)
-                                .addComponent(btnCancelarClientes))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(137, 137, 137)
-                                .addComponent(lblCliente)))
-                        .addGap(0, 40, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(lblAdministracionClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addComponent(btnGuardarClientes)
+                        .addGap(19, 19, 19)
+                        .addComponent(btnGuardarClientesModificar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCancelarClientes)))
+                .addGap(94, 94, 94))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(lblAdministracionClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblAdministracionClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(lblCliente)
                 .addGap(38, 38, 38)
@@ -251,11 +398,12 @@ public void buscarDni(String dni) {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardarClientes)
-                    .addComponent(btnCancelarClientes))
-                .addContainerGap(44, Short.MAX_VALUE))
+                    .addComponent(btnCancelarClientes)
+                    .addComponent(btnGuardarClientesModificar))
+                .addContainerGap())
         );
 
         pack();
@@ -265,6 +413,7 @@ public void buscarDni(String dni) {
     private void btnGuardarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarClientesActionPerformed
         // TODO add your handling code here:
        try{
+        
         if (txtNombre.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "El nombre del Cliente no puede estar vacio",
@@ -274,6 +423,74 @@ public void buscarDni(String dni) {
 
             return;
         }
+           
+        if (txtDni.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "El DNI no puede estar vacio",
+                    "DNI Invalido",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+        Object [] opciones = {"SI", "NO"};
+       int respuesta = JOptionPane.showOptionDialog(null, "Desea Agregar/Modificar","Agregar/Modificar" ,JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, opciones, opciones[1 ]);
+                //guardar en la tabla
+        if (respuesta == 0) {
+            this.setVisible(false);
+        }else{
+            
+        }
+       
+       }catch(HeadlessException e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+       
+         
+    }//GEN-LAST:event_btnGuardarClientesActionPerformed
+public String getID(){
+return txtId.getText().trim();
+}
+public void setID(String id){
+txtId.setText(id);
+}
+    private void btnCancelarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarClientesActionPerformed
+        // TODO add your handling code here:
+        this.setRootPane(null); // estoy destruyendo los elementos en la UI
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarClientesActionPerformed
+
+    private void txtDniKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDniKeyReleased
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_txtDniKeyReleased
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        txtId.setVisible(false);
+        
+    }//GEN-LAST:event_formWindowOpened
+
+    private void txtDniFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDniFocusLost
+        // TODO add your handling code here:
+        buscarDni(txtDni.getText());
+        
+        
+    }//GEN-LAST:event_txtDniFocusLost
+
+    private void btnGuardarClientesModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarClientesModificarActionPerformed
+        // TODO add your handling code here:
+        try {
+            if (txtNombre.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "El nombre del Cliente no puede estar vacio",
+                    "Nombre Invalido",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+           
         if (txtDni.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "El DNI no puede estar vacio",
@@ -284,30 +501,53 @@ public void buscarDni(String dni) {
             return;
         }
         
-        int respuesta = JOptionPane.showConfirmDialog(this, "Quieres agregar/modificar este Cliente?");
+        } catch (HeadlessException e) {
+        }
+        modificar_cliente(this.getID());
+    }//GEN-LAST:event_btnGuardarClientesModificarActionPerformed
 
-                //guardar en la tabla
-        if (respuesta == 0) {
-            this.setVisible(false);
+    private void btnGuardarClientesModificarStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_btnGuardarClientesModificarStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGuardarClientesModificarStateChanged
+
+    private void txtTelefonoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefonoKeyTyped
+        
+        // Captura la tecla apretada, valida que este entre los parametros 0,9 y si esta deja el numero y si no, no deja poner algun otro caracter
+        int key = evt.getKeyChar();
+        boolean numero = key >= 48 && key <= 57;
+        
+        if (!numero) {
+            evt.consume();
+        }
+        //no deja sobrepasar el tamaño maximo
+        if (txtTelefono.getText().trim().length() == 8) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtTelefonoKeyTyped
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        // TODO add your handling code here:
+        //lo contrario que el anterior para validar que no entre ningun numero
+        int key = evt.getKeyChar();
+        boolean numero = key >= 48 && key <= 57;
+        
+        if (numero) {
+            evt.consume();
+        }
+        //no deja sobrepasar el tamaño maximo
+        if (txtNombre.getText().trim().length() == 99) {
+            evt.consume();
         }
        
-       }catch(HeadlessException e) {
-                JOptionPane.showMessageDialog(null, e);
-            }
-       
-         
-    }//GEN-LAST:event_btnGuardarClientesActionPerformed
+    }//GEN-LAST:event_txtNombreKeyTyped
 
-    private void btnCancelarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarClientesActionPerformed
+    private void txtDniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDniKeyTyped
         // TODO add your handling code here:
-        this.setRootPane(null); // estoy destruyendo los elementos en la UI
-        this.dispose();
-    }//GEN-LAST:event_btnCancelarClientesActionPerformed
-
-    private void txtDniKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDniKeyReleased
-        // TODO add your handling code here:
-        buscarDni(txtDni.getText());
-    }//GEN-LAST:event_txtDniKeyReleased
+        //no deja sobrepasar el tamaño maximo
+        if (txtDni.getText().trim().length() == 19) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtDniKeyTyped
 
     /**
      * @param args the command line arguments
@@ -354,6 +594,7 @@ public void buscarDni(String dni) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelarClientes;
     private javax.swing.JButton btnGuardarClientes;
+    private javax.swing.JButton btnGuardarClientesModificar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -364,6 +605,7 @@ public void buscarDni(String dni) {
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtDni;
     private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables

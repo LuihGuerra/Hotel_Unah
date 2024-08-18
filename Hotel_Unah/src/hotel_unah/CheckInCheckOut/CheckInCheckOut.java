@@ -4,6 +4,7 @@
  */
 package hotel_unah.CheckInCheckOut;
 
+import com.mysql.cj.protocol.Resultset;
 import hotel_unah.Conexion;
 import java.awt.HeadlessException;
 import java.sql.Connection;
@@ -151,7 +152,6 @@ public class CheckInCheckOut {
                     actualizarCheckIn(tblCheckin);
                     conn.cerrarConexion();
                     
-                    
             }else{
                    JOptionPane.showMessageDialog(null, "Reserva Fuera de tiempo");                
             }
@@ -161,123 +161,6 @@ public class CheckInCheckOut {
         }
         
     }
-    public void comprobarCheckout(JTextField txtBuscarCheckout, JTable tblCheckout){
-        try{
-        Conexion conn = Conexion.getInstance();
-        Connection conexion = conn.conectar();
-        
-        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkouts WHERE checkin_id = ?");
-        consulta.setString(1, txtBuscarCheckout.getText().trim());
-        ResultSet resultado = consulta.executeQuery();
-        
-            
-            if (resultado.next()) {
-                JOptionPane.showMessageDialog(null, "Ya hizo Check Out");
-                conn.cerrarConexion();
-            }else{
-                buscarCheckout(txtBuscarCheckout.getText(), tblCheckout);
-                conn.cerrarConexion();
-                
-            }
-            conn.cerrarConexion();
-        }catch(HeadlessException | SQLException e){
-        
-        }
-    }
-   public void checkout(String checkInId, JTable tblCheckout){
-       
-       try {
-           Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-             PreparedStatement consulta = conexion.prepareStatement("INSERT INTO checkouts(checkin_id, fecha_checkout) VALUES (?,CURRENT_TIMESTAMP());");
-             consulta.setString(1, checkInId);
-             consulta.executeUpdate();
-             actualizarCheckOut(tblCheckout);
-             JOptionPane.showMessageDialog(null, "Check out realizado correctamente");
-             conn.cerrarConexion();
-       } catch (SQLException e) {
-       }
-   }
-    public void buscarCheckout(String txtBuscarCheckout, JTable tblCheckout){
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-             PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE checkins.id = ?");
-            consulta.setString(1, txtBuscarCheckout);
-        ResultSet resultado = consulta.executeQuery();
-        
-            
-            if (resultado.next()) {
-                Object [] opciones = {"SI", "NO"};
-                int respuesta = JOptionPane.showOptionDialog(null, "Desea Hacer el Check out?","Check Out" ,JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, opciones, opciones[1 ]);
-                if (respuesta==-1) {
-                     //Por si hace cosas raras el boton "x"
-                }else{
-               if (respuesta==0) {
-                checkout(resultado.getString(1), tblCheckout);
-                buscarHabitacion(resultado.getString(2));
-                conn.cerrarConexion();
-               }else{return;}}
-                
-                
-                
-            }else{
-                JOptionPane.showMessageDialog(null, "Checkin no Encontrado");
-                conn.cerrarConexion();
-                
-            }
-            conn.cerrarConexion();
-            
-        } catch (HeadlessException | SQLException e) {
-        }
-    
-    }
-    public void buscarHabitacion(String reservasId){
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN checkins ON reservas.id=checkins.reserva_id WHERE checkins.reserva_id=?");
-            consulta.setString(1, reservasId);
-            ResultSet resultado= consulta.executeQuery();
-            if (resultado.next()) {
-                cambiarEstadoHabitacionLimpieza(resultado.getString(3));
-            }
-            
-            conn.cerrarConexion();
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    
-    }
-        public void finalizarReserva(String reservaId){
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET reservas.estado ='finalizada' WHERE reservas.id=?;"); 
-            actualizar.setString(1, reservaId);
-            actualizar.executeUpdate();
-            conn.cerrarConexion();
-            
-            
-        } catch (SQLException e) {
-        }
-}
-    public void cambiarEstadoHabitacionLimpieza(String habitacionId){
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='en limpieza' WHERE id=?;"); 
-            actualizar.setString(1, habitacionId);
-            actualizar.executeUpdate();
-            conn.cerrarConexion();
-            
-            
-        } catch (SQLException e) {
-        }
-    
-    }
-
     public void cambiarEstadoHabitacion(String habitacion_id){
         try {
             Conexion conn = Conexion.getInstance();
@@ -296,7 +179,7 @@ public class CheckInCheckOut {
         try {
             Conexion conn = Conexion.getInstance();
             Connection conexion = conn.conectar();
-            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET estado ='confirmada' WHERE id='?;"); 
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET estado ='confirmada' WHERE id=?;"); 
             actualizar.setString(1, reservaId);
             actualizar.executeUpdate();
             conn.cerrarConexion();
@@ -311,8 +194,8 @@ public class CheckInCheckOut {
             Connection conexion = conn.conectar();
              
             //PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas WHERE id = '"+txtBuscarCkeckin.getText().trim()+"'");  
-           PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=?"); 
-            busqueda.setString(1, txtBuscarCkeckin.getText().trim()); 
+            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=?"); 
+            busqueda.setString(1, txtBuscarCkeckin.getText().trim());
             ResultSet consulta = busqueda.executeQuery();
                            
             if (consulta.next()) {
@@ -336,6 +219,7 @@ public class CheckInCheckOut {
                             "Cancelar Reservacion", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, opciones3, opciones3[1]);
                         if (respuesta3 == 0) {
                             //Proceder con la Cancelacion de la reservacion
+                            cancelarReserva(consulta.getString(1));
                             JOptionPane.showMessageDialog(null, "Reservacion Cancelada");
                         }
                         if (respuesta3 == -1) {
@@ -368,12 +252,288 @@ public class CheckInCheckOut {
                 JOptionPane.showMessageDialog(null, "Reserva no Encontrada", "Reserva no Econtrada", 0);
             }
         conn.cerrarConexion();
-        }catch(Exception e){
+        }catch(HeadlessException | SQLException | ParseException e){
         
         
         
         }
             
+    
+    }
+    
+    
+    public void comprobarCheckout(String reservaId, JTable tblCheckout){
+    
+        try {
+            Conexion conn = Conexion.getInstance();
+        Connection conexion = conn.conectar();
+        
+        PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkouts INNER JOIN checkins ON checkouts.checkin_id=checkins.id WHERE checkins.reserva_id=?");
+        
+        consulta.setString(1, reservaId);
+        ResultSet resultado =  consulta.executeQuery();
+        
+        if (resultado.next()) {
+                JOptionPane.showMessageDialog(null, "Ya hizo Checkout");
+                conn.cerrarConexion();
+            }else{
+                conn.cerrarConexion();
+               //Lo que sigue
+               Object [] opciones = {"SI", "NO"};
+            int respuesta = JOptionPane.showOptionDialog(null, "Desea hacer el Checkout?","Checkout" ,JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE,null, opciones, opciones[1]);
+            if (respuesta == -1){
+            return;
+            }
+            if (respuesta == 0) {
+            }
+                JOptionPane.showMessageDialog(null, "Checkout Realizado Correctamente");
+                
+               checkout(reservaId,getCheckinID(reservaId), tblCheckout);
+               finalizarReserva(reservaId);
+               fechasCheckinsCheckouts(reservaId);
+               conn.cerrarConexion();
+            }
+            conn.cerrarConexion();
+        
+        } catch (HeadlessException | SQLException e) {
+        }
+    
+    }public void fechasCheckinsCheckouts(String reservasId){
+    
+            try {
+                Conexion conn = Conexion.getInstance();
+                Connection conexion = conn.conectar();
+                
+                PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins INNER JOIN checkouts ON checkins.id=checkouts.checkin_id WHERE checkins.reserva_id=?");
+                consulta.setString(1, reservasId);
+                
+                ResultSet resultado = consulta.executeQuery();
+                
+                if (resultado.next()) {
+                    
+                  precioporNoche(resultado.getString(3), resultado.getString(6), reservasId);  
+                    
+                }
+                conn.cerrarConexion();
+            } catch (SQLException e) {
+                
+                
+            }
+    
+    }
+    public void precioporNoche(String fechaCheckin, String fechaCheckout, String reservasId){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion= conn.conectar();
+            
+            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM habitaciones INNER JOIN reservas ON habitaciones.id=reservas.habitacion_id WHERE reservas.id=?");
+           consulta.setString(1, reservasId);
+            
+            ResultSet resultado = consulta.executeQuery();
+            
+           
+            if (resultado.next()) {
+                
+                totalPorHospedaje(fechaCheckin, fechaCheckout, reservasId, resultado.getString(5));
+                conn.cerrarConexion();
+            }
+            conn.cerrarConexion();
+                    
+        } catch (SQLException e) {
+        }
+    
+    }
+    
+    public void totalPorHospedaje(String fechaCheckin, String fechaCheckout, String reservasId, String precioNoche){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion= conn.conectar();
+            
+            PreparedStatement consulta = conexion.prepareStatement("SELECT DATEDIFF (?, ?);");
+            
+            consulta.setString(1, fechaCheckout);
+            consulta.setString(2, fechaCheckin);
+            
+            ResultSet resultado = consulta.executeQuery();
+            
+            if (resultado.next()) {
+                System.out.println("Dias Diferencia "+resultado.getString(1));
+                
+                double total = Double.parseDouble(resultado.getString(1))*Double.parseDouble(precioNoche);
+                System.out.println("Total "+ total );
+                
+                factura(fechaCheckin, fechaCheckout, reservasId, precioNoche, total, resultado.getString(1));
+                conn.cerrarConexion();
+            }
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+        }
+    
+    
+    }
+    public void factura(String fechaCheckin, String fechaCheckout, String reservasId, String precioNoche, double total, String dias){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion= conn.conectar();
+            
+            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=?"); 
+            busqueda.setString(1, reservasId);
+            ResultSet consulta = busqueda.executeQuery();
+            
+             if (consulta.next()) {
+             
+             Object [] opciones = {"OK"};
+                
+               int respuesta = JOptionPane.showOptionDialog(null, 
+                        "<html><p>Nombre Cliente: "+ consulta.getString(8)+" </p><br></html>"                       
+                       + "<html><p>Numero Reserva: "+ consulta.getString(1)+"</p><br></html>"
+                       + "<html><p>Numero Habitacion: "+ consulta.getString(14)+"</p><br></html>"
+                       + "<html><p>Fecha de Entrada: "+ consulta.getString(4)+"</p><br></html>"
+                       + "<html><p>Fecha de Salida: "+ consulta.getString(5)+"</p><br></html>"
+                       + "<html><p>Fecha Checkin: "+ fechaCheckin+"</p><br></html>"
+                       + "<html><p>Fecha Checkout: "+ fechaCheckout+"</p><br></html>"
+                       + "<html><p>Dias Hospedados: "+ dias+"</p><br></html>"
+                       + "<html><p>Precio por noche: "+ precioNoche+"</p><br></html>"
+                       + "<html><p>Total: "+ total+" USD</p><br></html>", 
+                       "Factura", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, opciones, opciones[0]);
+               if (respuesta==-1) {
+                     //Por si hace cosas raras el boton "x"
+                     conn.cerrarConexion();
+                     return;
+                }else{
+               if (respuesta==0) {
+                  conn.cerrarConexion();
+                   return;
+               }
+               conn.cerrarConexion();
+               }
+               conn.cerrarConexion();
+             }
+        } catch (Exception e) {
+        }
+    
+    
+    }
+    public String getCheckinID(String reservaId){
+    
+        try {
+            Conexion conn = Conexion.getInstance();
+        Connection conexion = conn.conectar();
+        
+        PreparedStatement consulta = conexion.prepareStatement("SELECT id FROM checkins WHERE checkins.reserva_id=?");
+        consulta.setString(1, reservaId);
+        ResultSet resultado = consulta.executeQuery();
+        
+            if (resultado.next()) {
+                return resultado.getString(1);
+            }
+        } catch (SQLException e) {
+            
+        }
+            return null;
+    
+    }
+    public void checkout(String reservaId, String checkinId, JTable tblCheckout){
+        try {
+            Conexion conn = Conexion.getInstance();
+        Connection conexion = conn.conectar();
+        
+        PreparedStatement insertar = conexion.prepareStatement("INSERT INTO checkouts (checkin_id, fecha_checkout) VALUES (?,CURRENT_TIMESTAMP())");
+        insertar.setString(1, checkinId);
+        insertar.executeUpdate();
+        JOptionPane.showMessageDialog(null, "Checkout Realizado con Exito");
+            buscarHabitacion(reservaId);
+            actualizarCheckOut(tblCheckout);
+            conn.cerrarConexion();
+        
+        } catch (HeadlessException | SQLException e) {
+        }
+    
+    
+    }
+    public void buscarHabitacion(String reservasId){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN checkins ON reservas.id=checkins.reserva_id WHERE checkins.reserva_id=?");
+            consulta.setString(1, reservasId);
+            ResultSet resultado= consulta.executeQuery();
+            if (resultado.next()) {
+                cambiarEstadoHabitacionLimpieza(resultado.getString(3));
+            }
+            
+            conn.cerrarConexion();
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    
+    }
+    public void buscarCheckin(String reservasId, JTable tblCheckout){
+    
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            
+            PreparedStatement consulta = conexion.prepareStatement("SELECT * FROM checkins WHERE checkins.reserva_id=?");
+            consulta.setString(1, reservasId);
+            ResultSet resultado= consulta.executeQuery();
+            
+            if (resultado.next()) {
+                comprobarCheckout(reservasId, tblCheckout);
+                conn.cerrarConexion();
+            }else{
+                JOptionPane.showMessageDialog(null, "No ha hecho Checkin");
+                
+                conn.cerrarConexion();
+                return;
+            }
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+        }
+    
+    
+    }
+    public void cambiarEstadoHabitacionLimpieza(String habitacionId){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE habitaciones SET estado ='en limpieza' WHERE id=?;"); 
+            actualizar.setString(1, habitacionId);
+            actualizar.executeUpdate();
+            conn.cerrarConexion();
+            
+            
+        } catch (SQLException e) {
+        }
+    
+    }
+    public void finalizarReserva(String reservaId){
+        try {
+            Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET reservas.estado ='finalizada' WHERE reservas.id=?;"); 
+            actualizar.setString(1, reservaId);
+            actualizar.executeUpdate();
+            conn.cerrarConexion();
+            
+            
+        } catch (SQLException e) {
+        }
+    }
+    
+    public void cancelarReserva(String reservaId){
+    
+        try {
+             Conexion conn = Conexion.getInstance();
+            Connection conexion = conn.conectar();
+            PreparedStatement actualizar= conexion.prepareStatement("UPDATE reservas SET reservas.estado ='cancelada' WHERE reservas.id=?;"); 
+            actualizar.setString(1, reservaId);
+            actualizar.executeUpdate();
+            conn.cerrarConexion();
+        } catch (SQLException e) {
+            
+        }
     
     }
 }
