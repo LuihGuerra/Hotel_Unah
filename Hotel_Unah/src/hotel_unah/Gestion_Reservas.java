@@ -7,8 +7,7 @@ package hotel_unah;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-//import java.util.Date;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
@@ -30,45 +29,43 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     }
     
     private void guardarReserva() {
-    try {
-            // Obtiene las fechas de entrada y salida desde los campos de texto
-            Timestamp fechaSeleccionadaEntrada = Timestamp.valueOf(fechaEnt.getDate().toString());
-            Timestamp fechaSeleccionadaSalida = Timestamp.valueOf(fechaSal.getDate().toString());
-
-            // Agrega la reserva a la tabla y guarda en la base de datos
-            mainHotel.agregarReservaATabla(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
-            guardarReservaEnBaseDeDatos(fechaSeleccionadaEntrada, fechaSeleccionadaSalida);
-
-        } catch (IllegalArgumentException e) {
-             JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use el formato: YYYY-MM-DD HH:MM:SS", "Error", JOptionPane.ERROR_MESSAGE);}
+    //Solo guarda la fecha, quedan pendientes los demas datos.   
+    Date fechaSeleccionadaEntrada = fechaEnt.getDate();
+    Date fechaSeleccionadaSalida = fechaSal.getDate();
+    
+    java.sql.Date sqlDateEntrada = new java.sql.Date(fechaSeleccionadaEntrada.getTime());
+    java.sql.Date sqlDateSalida = new java.sql.Date(fechaSeleccionadaSalida.getTime());
+    
+    mainHotel.agregarReservaATabla(sqlDateEntrada, sqlDateSalida);
+    guardarReservaEnBaseDeDatos(sqlDateEntrada, sqlDateSalida);
 }
     
-    private void guardarReservaEnBaseDeDatos(Timestamp fechaEntrada, Timestamp fechaSalida) {
-        Connection conexion = null;
-        PreparedStatement pstmt = null;
+    private void guardarReservaEnBaseDeDatos(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
+    Connection conexion = null;
+    PreparedStatement pstmt = null;
+    
+    try {
+        Conexion conn = Conexion.getInstance();
+        conexion = conn.conectar();
+        String sql = "INSERT INTO RESERVAS (fecha_entrada, fecha_salida) VALUES (?, ?)";
+        pstmt = conexion.prepareStatement(sql);
+        pstmt.setDate(1, fechaEntrada);
+        pstmt.setDate(2, fechaSalida);  // Añadir fecha_salida aquí
+        pstmt.executeUpdate();
 
+        JOptionPane.showMessageDialog(this, "Reserva guardada exitosamente");
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar la reserva: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+    } finally {
         try {
-            Conexion conn = Conexion.getInstance();
-            conexion = conn.conectar();
-            String sql = "INSERT INTO RESERVAS (fecha_entrada, fecha_salida) VALUES (?, ?)";
-            pstmt = conexion.prepareStatement(sql);
-            pstmt.setTimestamp(1, fechaEntrada);
-            pstmt.setTimestamp(2, fechaSalida);
-            pstmt.executeUpdate();
-
-            JOptionPane.showMessageDialog(this, "Reserva guardada exitosamente");
-
+            if (pstmt != null) pstmt.close();
+            if (conexion != null) conexion.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar la reserva: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-                if (conexion != null) conexion.close();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al cerrar la conexión: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(this, "Error al cerrar la conexión: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
     }
 
     /**
@@ -84,12 +81,10 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         cbxEstado = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
         fechaEnt = new com.toedter.calendar.JCalendar();
         jLabel8 = new javax.swing.JLabel();
@@ -97,6 +92,8 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         fechaSal = new com.toedter.calendar.JCalendar();
         btnSalir = new javax.swing.JButton();
         btnAgregarReserva = new javax.swing.JButton();
+        txtClienteId = new javax.swing.JTextField();
+        txtHabitacionId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -111,8 +108,6 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("DATOS DE RESERVA");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel4.setText("Cliente ID:");
 
@@ -123,8 +118,6 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         jLabel7.setText("Estado de reserva:");
 
         cbxEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/calendario.png"))); // NOI18N
 
@@ -173,12 +166,12 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                                 .addComponent(fechaSal, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel4)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jLabel2))
-                                .addGap(42, 42, 42)
+                                        .addComponent(txtClienteId, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(48, 48, 48)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel6)
@@ -188,7 +181,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel5)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtHabitacionId, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jLabel7)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -198,7 +191,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                         .addComponent(btnAgregarReserva)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSalir)))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(216, 216, 216)
@@ -223,10 +216,10 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(cbxEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbxEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtClienteId, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtHabitacionId, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(38, 38, 38)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
@@ -257,7 +250,6 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         );
 
         pack();
-        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
@@ -280,6 +272,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         modelo.addElement("Pendiente");
         modelo.addElement("Cancelada");
         cbxEstado.setModel(modelo);
+
     }//GEN-LAST:event_formWindowOpened
 
     /**
@@ -331,8 +324,6 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     private javax.swing.JComboBox<String> cbxEstado;
     private com.toedter.calendar.JCalendar fechaEnt;
     private com.toedter.calendar.JCalendar fechaSal;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -343,5 +334,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField txtClienteId;
+    private javax.swing.JTextField txtHabitacionId;
     // End of variables declaration//GEN-END:variables
 }
