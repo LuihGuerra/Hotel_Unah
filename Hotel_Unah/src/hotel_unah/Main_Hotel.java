@@ -8,14 +8,13 @@ import hotel_unah.CheckInCheckOut.CheckInCheckOut;
 import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.Vector;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Date;
+import hotel_unah.reporteHabitaciones.reporteHabitaciones;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -28,7 +27,6 @@ public class Main_Hotel extends javax.swing.JFrame {
      * Creates new form Main_Hotel
      */
     DefaultTableModel modelo = new DefaultTableModel();
-    DefaultTableModel modelo1 = new DefaultTableModel();
 
     public Main_Hotel() {
         initComponents();
@@ -590,161 +588,6 @@ public class Main_Hotel extends javax.swing.JFrame {
         }
     }
     
-    /*-------------------------------------------------------------------------
-                                GESTION DE RESERVAS
-    -------------------------------------------------------------------------*/
-
-    /*-------------------------------------------------------------------------
-                                    CREATE
-    -------------------------------------------------------------------------*/
-    public void agregarReserva(java.sql.Date fechaEntrada, java.sql.Date fechaSalida, int clienteId, int habitacionId, String estado) {
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "INSERT INTO reservas (cliente_id, habitacion_id, fecha_entrada, fecha_salida, estado) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement ps = conexion.prepareStatement(query);
-
-            ps.setInt(1, clienteId);
-            ps.setInt(2, habitacionId);
-            ps.setDate(3, fechaEntrada);
-            ps.setDate(4, fechaSalida);
-            ps.setString(5, estado);
-
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Reserva agregada correctamente");
-
-            actualizar_tabla_reservas();
-            conn.cerrarConexion();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al agregar la reserva: " + e.getMessage());
-        }
-    }
-
-    /*-------------------------------------------------------------------------
-                                    READ
-    -------------------------------------------------------------------------*/
-    public void cargarReservas() {
-        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
-    model.setRowCount(0);
-   /* try {
-        List<Reserva> reservas = obtenerReservas();
-        for (Reserva reserva : reservas) {
-            model.addRow(new Object[]{
-                reserva.getId(),
-                reserva.getFechaEntrada(),
-                reserva.getFechaSalida(),
-                reserva.getEstado()
-            });
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
-    }*/
-}
-
-/*private List<Reserva> obtenerReservas() throws SQLException {
-    List<Reserva> reservas = new ArrayList<>();
-    String query = "SELECT * FROM reservas";
-
-    try (Connection conexion = Conexion.getInstance().conectar();
-         PreparedStatement stmt = conexion.prepareStatement(query);
-         ResultSet rs = stmt.executeQuery()) {
-
-        while (rs.next()) {
-            reservas.add(new Reserva(
-                rs.getInt("id"),
-                rs.getTimestamp("fecha_entrada"),
-                rs.getTimestamp("fecha_salida"),
-                rs.getString("estado")
-            ));
-        }
-    }
-
-    return reservas;
-    }
-    */
-   /*-------------------------------------------------------------------------
-                                    UPDATE
-    -------------------------------------------------------------------------*/  
-    public void actualizar_tabla_reservas() {
-        try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "SELECT * FROM reservas";
-            PreparedStatement stmt = conexion.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-
-            modelo1 = new DefaultTableModel() {
-                @Override
-                public boolean isCellEditable(int row, int col) {
-                    return false;
-                }
-            };
-
-            modelo1.addColumn("id");
-            modelo1.addColumn("cliente_id");
-            modelo1.addColumn("habitacion_id");
-            modelo1.addColumn("fecha_entrada");
-            modelo1.addColumn("fecha_salida");
-            modelo1.addColumn("estado");
-
-            tblReservas.setModel(modelo1);
-
-            while (rs.next()) {
-                Vector<Object> fila = new Vector<>();
-                fila.add(rs.getInt("id"));
-                fila.add(rs.getInt("cliente_id"));
-                fila.add(rs.getInt("habitacion_id"));
-                fila.add(rs.getTimestamp("fecha_entrada"));
-                fila.add(rs.getTimestamp("fecha_salida"));
-                fila.add(rs.getString("estado"));
-                modelo1.addRow(fila);
-            }
-
-            conn.cerrarConexion();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar la tabla de reservas: " + e.getMessage());
-        }
-    }
-
-    public void agregarReservaATabla(java.sql.Timestamp fechaEntrada, java.sql.Timestamp fechaSalida) {
-        String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
-        String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
-
-        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
-        model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
-    }
-/*-------------------------------------------------------------------------
-                                    DELETE
-    -------------------------------------------------------------------------*/
-    public void cancelar_reservas() {
-        try {
-            if (tblReservas.getSelectedRow() == -1) {
-                return;
-            }
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "DELETE FROM reservas WHERE id = ?";
-            PreparedStatement ps = conexion.prepareStatement(query);
-
-            Vector registro = (Vector) modelo1.getDataVector().elementAt(tblReservas.getSelectedRow());
-            int idReservaCancelar = (Integer) registro.elementAt(0);
-
-            int respuesta = JOptionPane.showConfirmDialog(this, "¿Quieres cancelar esta reserva?", "Confirmar Cancelación", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                ps.setInt(1, idReservaCancelar);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Reserva cancelada correctamente");
-                actualizar_tabla_reservas();
-            }
-            conn.cerrarConexion();
-        } catch (HeadlessException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al cancelar la reserva: " + e.getMessage());
-        }
-    }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -776,19 +619,19 @@ public class Main_Hotel extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tablaReservas = new javax.swing.JTable();
-        btnNuevaReserva = new javax.swing.JButton();
-        btnModificarReserva = new javax.swing.JButton();
-        btnCancelarReserva = new javax.swing.JButton();
+        jTable3 = new javax.swing.JTable();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jdcPrimerFecha = new com.toedter.calendar.JDateChooser();
         jLabel1 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jTable5 = new javax.swing.JTable();
-        jButton13 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
-        jButton15 = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jdcSegundaFecha = new com.toedter.calendar.JDateChooser();
+        btnReporteHabitaciones = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCheckin = new javax.swing.JTable();
@@ -985,7 +828,7 @@ public class Main_Hotel extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Administración de Habitaciones", jPanel2);
 
-        tablaReservas.setModel(new javax.swing.table.DefaultTableModel(
+        jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -996,32 +839,16 @@ public class Main_Hotel extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(tablaReservas);
+        jScrollPane3.setViewportView(jTable3);
 
-        btnNuevaReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reserva.png"))); // NOI18N
-        btnNuevaReserva.setText(" Nuevo");
-        btnNuevaReserva.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNuevaReservaActionPerformed(evt);
-            }
-        });
+        jButton7.setText("Nuevo");
 
-        btnModificarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/contrato.png"))); // NOI18N
-        btnModificarReserva.setText(" Modificar");
+        jButton8.setText("Modificar");
 
-        btnCancelarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/cancelar.png"))); // NOI18N
-        btnCancelarReserva.setText(" Cancelar");
-        btnCancelarReserva.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelarReservaActionPerformed(evt);
-            }
-        });
+        jButton9.setText("Cancelar");
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reserva (2).png"))); // NOI18N
-
-        jLabel8.setFont(new java.awt.Font("Arial", 1, 19)); // NOI18N
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("GESTION DE RESERVAS");
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel3.setText("Gestión de Reservas");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1029,106 +856,99 @@ public class Main_Hotel extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(54, 54, 54)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(70, 70, 70)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-                        .addGap(70, 70, 70)))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnModificarReserva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnNuevaReserva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCancelarReserva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(287, Short.MAX_VALUE))
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
+                .addGap(70, 70, 70)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(343, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(223, 223, 223)
-                .addComponent(btnNuevaReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnModificarReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnCancelarReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(60, 60, 60)
-                        .addComponent(jLabel8))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(jLabel1)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(52, 52, 52))
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(175, 175, 175)
+                .addComponent(jButton7)
+                .addGap(18, 18, 18)
+                .addComponent(jButton8)
+                .addGap(18, 18, 18)
+                .addComponent(jButton9)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Gestión de Reservas", jPanel3);
 
-        jTable5.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane5.setViewportView(jTable5);
-
-        jButton13.setText("Nuevo");
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
-            }
-        });
-
-        jButton14.setText("Modificar");
-
-        jButton15.setText("Eliminar");
-
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel5.setText("Informes y Reportes ");
+
+        jLabel1.setText("Primer Fecha");
+
+        jLabel8.setText("Segunda Fecha");
+
+        jLabel9.setText("Reportes de Ocupacion");
+
+        btnReporteHabitaciones.setText("Generar Reporte");
+        btnReporteHabitaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteHabitacionesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane5))
-                .addGap(70, 70, 70)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(343, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(40, 40, 40)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(35, 35, 35)
+                                        .addComponent(btnReporteHabitaciones))
+                                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(52, 52, 52))
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(175, 175, 175)
-                .addComponent(jButton13)
-                .addGap(18, 18, 18)
-                .addComponent(jButton14)
-                .addGap(18, 18, 18)
-                .addComponent(jButton15)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addComponent(jLabel9)
+                            .addGap(19, 19, 19)
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel8))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(63, 63, 63)
+                        .addComponent(btnReporteHabitaciones)))
+                .addContainerGap(379, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Informes y Reportes", jPanel5);
@@ -1230,7 +1050,7 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtBuscarCkeckin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnBuscarCheckin))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1269,9 +1089,6 @@ public class Main_Hotel extends javax.swing.JFrame {
         //Administarcions de Clientes
         actualizar_tabla_clientes();     
         btnResetTable.setVisible(false);
-        
-        //Gestion de Reservas
-        actualizar_tabla_reservas();
          
          
        //CheckIh Ckeck Out
@@ -1280,10 +1097,6 @@ public class Main_Hotel extends javax.swing.JFrame {
       llenarTablas.actualizarCheckIn(tblCheckin);
        
     }//GEN-LAST:event_formWindowOpened
-
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton13ActionPerformed
 
     private void btnClientesNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesNuevoActionPerformed
         //Administarcions de Clientes     
@@ -1341,17 +1154,56 @@ public class Main_Hotel extends javax.swing.JFrame {
          buscar.comprobarCheckout(txtBuscarCkeckout, tblCheckout);
     }//GEN-LAST:event_btnBuscarCheckoutActionPerformed
 
-    private void btnNuevaReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaReservaActionPerformed
-        // TODO add your handling code here:
-        Gestion_Reservas ventanaReservas = new Gestion_Reservas(this, true, this);
-        ventanaReservas.setVisible(true);
-    }//GEN-LAST:event_btnNuevaReservaActionPerformed
+    private void btnReporteHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteHabitacionesActionPerformed
+           // Reporte de Habitaciones
+    
+    // seleccionar la fecha y ponerla como java.util.Date;
+    Date fecha1 = jdcPrimerFecha.getDate();
+    Date fecha2 = jdcSegundaFecha.getDate();
+    
+    // validación de que las fechas son correctas y no haya ningún error con ella
+    try {
+        if (fecha1.after(fecha2)) {
+            JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
+            return;
+        }
 
-    private void btnCancelarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarReservaActionPerformed
-        // TODO add your handling code here:
-        cancelar_reservas();
+        if (fecha1 == null) {
+            JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+            return;
+        }
+
+        if (fecha2 == null) {
+            JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+            return;
+        }
+    } catch (HeadlessException e) {
+        JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+        return;
+    }
+    
+    // cambiarle el formato
+    long d1 = fecha1.getTime();
+    long d2 = fecha2.getTime();
+    
+    // cambiarla a java.sql.Date; para que tenga el mismo formato que la fecha en la base de datos
+    java.sql.Date fecha1Corregida = new java.sql.Date(d1);
+    java.sql.Date fecha2Corregida = new java.sql.Date(d2);
+    
+    reporteHabitaciones reporte = new reporteHabitaciones(this, true);
+    
+    // verificar que haya algo de ocupación en las reservas, es decir si las habitaciones estuvieron ocupadas en ese tiempo
+    if (reporte.validarReservaciones(fecha1Corregida, fecha2Corregida) == 1) {
+        // muestra el reporte de la ocupación de las habitaciones
+        reporte.llenarTablaOcupadasLimpieza(fecha1Corregida, fecha2Corregida);
+        reporte.setVisible(true);
+    } else {
+        reporte.llenarTablaOcupadasLimpieza(fecha1Corregida, fecha2Corregida);
+        reporte.setVisible(true);
+    }
         
-    }//GEN-LAST:event_btnCancelarReservaActionPerformed
+        
+    }//GEN-LAST:event_btnReporteHabitacionesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1391,28 +1243,28 @@ public class Main_Hotel extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscarCheckin;
     private javax.swing.JButton btnBuscarCheckout;
-    private javax.swing.JButton btnCancelarReserva;
     private javax.swing.JButton btnClientesBuscar;
     private javax.swing.JButton btnClientesEliminar;
     private javax.swing.JButton btnClientesModificar;
     private javax.swing.JButton btnClientesNuevo;
-    private javax.swing.JButton btnModificarReserva;
-    private javax.swing.JButton btnNuevaReserva;
+    private javax.swing.JButton btnReporteHabitaciones;
     private javax.swing.JButton btnResetTable;
     private javax.swing.JComboBox<String> comboBusquedaClientes;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1422,15 +1274,15 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTable jTable5;
+    private javax.swing.JTable jTable3;
+    private com.toedter.calendar.JDateChooser jdcPrimerFecha;
+    private com.toedter.calendar.JDateChooser jdcSegundaFecha;
     private javax.swing.JLabel lblAdministracionClientes;
     private javax.swing.JLabel lblBCheckout;
     private javax.swing.JLabel lblBCheckout1;
-    private javax.swing.JTable tablaReservas;
     private javax.swing.JTable tblCheckin;
     private javax.swing.JTable tblCheckout;
     private javax.swing.JTable tblClientes;
