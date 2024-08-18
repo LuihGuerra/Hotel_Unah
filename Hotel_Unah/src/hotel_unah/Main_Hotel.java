@@ -591,77 +591,77 @@ public class Main_Hotel extends javax.swing.JFrame {
         };
      }
      
-      /*-------------------------------------------------------------------------
-                                GESTION DE RESERVAS
-    -------------------------------------------------------------------------*/
-         /*-------------------------------------------------------------------------
+     /*-------------------------------------------------------------------------------------------------------------------------------
+                                                          GESTION DE RESERVAS
+    -------------------------------------------------------------------------------------------------------------------------------*/
+
+    /*-------------------------------------------------------------------------
                                     CREATE
     -------------------------------------------------------------------------*/
     public void agregarReserva(java.sql.Date fechaEntrada, java.sql.Date fechaSalida, int clienteId, int habitacionId, String estado) {
+    Connection conexion = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        Conexion conn = Conexion.getInstance();
+        conexion = conn.conectar();
+
+        // Verificar si ya existe una reserva para el cliente y habitación en el rango de fechas
+        String checkQuery = "SELECT COUNT(*) FROM reservas WHERE habitacion_id = ? AND ((fecha_entrada <= ? AND fecha_salida >= ?) OR (fecha_entrada <= ? AND fecha_salida >= ?))";
+        ps = conexion.prepareStatement(checkQuery);
+        ps.setInt(1, habitacionId);
+        ps.setDate(2, fechaSalida);
+        ps.setDate(3, fechaEntrada);
+        ps.setDate(4, fechaSalida);
+        ps.setDate(5, fechaEntrada);
+
+        rs = ps.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+
+        if (count > 0) {
+            JOptionPane.showMessageDialog(null, "Ya existe una reserva para la habitación en el rango de fechas especificado.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Insertar la nueva reserva
+        String query = "INSERT INTO reservas (cliente_id, habitacion_id, fecha_entrada, fecha_salida, estado) VALUES (?, ?, ?, ?, ?)";
+        ps = conexion.prepareStatement(query);
+
+        ps.setInt(1, clienteId);
+        ps.setInt(2, habitacionId);
+        ps.setDate(3, fechaEntrada);
+        ps.setDate(4, fechaSalida);
+        ps.setString(5, estado);
+
+        ps.executeUpdate();
+
+        // Actualizar el estado de la habitación a 'ocupada'
+        String updateQuery = "UPDATE habitaciones SET estado = 'ocupada' WHERE id = ?";
+        ps = conexion.prepareStatement(updateQuery);
+        ps.setInt(1, habitacionId);
+        ps.executeUpdate();
+
+        JOptionPane.showMessageDialog(null, "Reserva agregada correctamente.");
+
+        // Actualizar la tabla de reservas en la interfaz
+        actualizar_tabla_reservas();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al agregar la reserva: " + e.getMessage());
+    } finally {
         try {
-            Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
-
-            String query = "INSERT INTO reservas (cliente_id, habitacion_id, fecha_entrada, fecha_salida, estado) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement ps = conexion.prepareStatement(query);
-
-            ps.setInt(1, clienteId);
-            ps.setInt(2, habitacionId);
-            ps.setDate(3, fechaEntrada);
-            ps.setDate(4, fechaSalida);
-            ps.setString(5, estado);
-
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Reserva agregada correctamente");
-
-            actualizar_tabla_reservas();
-            conn.cerrarConexion();
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al agregar la reserva: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al cerrar la conexión: " + e.getMessage());
         }
     }
-      /*-------------------------------------------------------------------------
-                                    READ
-    -------------------------------------------------------------------------*/
-    public void cargarReservas() {
-        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
-    model.setRowCount(0);
-    /*try {
-        List<Reserva> reservas = obtenerReservas();
-        for (Reserva reserva : reservas) {
-            model.addRow(new Object[]{
-                reserva.getId(),
-                reserva.getFechaEntrada(),
-                reserva.getFechaSalida(),
-                reserva.getEstado()
-            });
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "No se puede cargar las Reservas: " + e.getMessage());
-    }*/
 }
 
-/*private List<Reserva> obtenerReservas() throws SQLException {
-    List<Reserva> reservas = new ArrayList<>();
-    String query = "SELECT * FROM reservas";
-
-    try (Connection conexion = Conexion.getInstance().conectar();
-         PreparedStatement stmt = conexion.prepareStatement(query);
-         ResultSet rs = stmt.executeQuery()) {
-
-        while (rs.next()) {
-            reservas.add(new Reserva(
-                rs.getInt("id"),
-                rs.getTimestamp("fecha_entrada"),
-                rs.getTimestamp("fecha_salida"),
-                rs.getString("estado")
-            ));
-        }
-    }
-
-    return reservas;
-    }*/
-       /*-------------------------------------------------------------------------
+   /*-------------------------------------------------------------------------
                                     UPDATE
     -------------------------------------------------------------------------*/  
     public void actualizar_tabla_reservas() {
@@ -705,46 +705,84 @@ public class Main_Hotel extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error al actualizar la tabla de reservas: " + e.getMessage());
         }
     }
-    
-    public void agregarReservaATabla(java.sql.Timestamp fechaEntrada, java.sql.Timestamp fechaSalida) {
-        String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
-        String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
 
-        DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
-        model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
+    public void agregarReservaATabla(java.sql.Date fechaEntrada, java.sql.Date fechaSalida) {
+    // Convertir las fechas a un formato legible, si es necesario
+    String fechaEntradaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaEntrada);
+    String fechaSalidaFormateada = new SimpleDateFormat("yyyy-MM-dd").format(fechaSalida);
+
+    // Añadir una nueva fila a la tabla con los detalles de la reserva
+    DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
+    model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
     }
     
+    /*-------------------------------------------------------------------------
+                                    MODIFICAR
+    -------------------------------------------------------------------------*/
+   
+
+
+
     
-    
-   /*------------------------------------------------------------------------
+/*-------------------------------------------------------------------------
                                     DELETE
     -------------------------------------------------------------------------*/
-    public void cancelar_reservas() {
+    
+    public void cancelarReserva(int reservaId, int habitacionId) {
+        Connection conexion = null;
+        PreparedStatement ps = null;
+
         try {
-            if (tblReservas.getSelectedRow() == -1) {
-                return;
-            }
             Conexion conn = Conexion.getInstance();
-            Connection conexion = conn.conectar();
+            conexion = conn.conectar();
 
-            String query = "DELETE FROM reservas WHERE id = ?";
-            PreparedStatement ps = conexion.prepareStatement(query);
+            // Eliminar la reserva
+            String deleteQuery = "DELETE FROM reservas WHERE id = ?";
+            ps = conexion.prepareStatement(deleteQuery);
+            ps.setInt(1, reservaId);
+            ps.executeUpdate();
 
-            Vector registro = (Vector) modelo1.getDataVector().elementAt(tblReservas.getSelectedRow());
-            int idReservaCancelar = (Integer) registro.elementAt(0);
+            // Actualizar el estado de la habitación a 'disponible'
+            String updateQuery = "UPDATE habitaciones SET estado = 'disponible' WHERE id = ?";
+            ps = conexion.prepareStatement(updateQuery);
+            ps.setInt(1, habitacionId);
+            ps.executeUpdate();
 
-            int respuesta = JOptionPane.showConfirmDialog(this, "¿Quieres cancelar esta reserva?", "Confirmar Cancelación", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                ps.setInt(1, idReservaCancelar);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Reserva cancelada correctamente");
-                actualizar_tabla_reservas();
-            }
-            conn.cerrarConexion();
-        } catch (HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(null, "Reserva cancelada correctamente.");
+
+            // Actualizar la tabla de reservas en la interfaz
+            actualizar_tabla_reservas();
+
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al cancelar la reserva: " + e.getMessage());
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (conexion != null) conexion.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Error al cerrar la conexión: " + e.getMessage());
+            }
         }
     }
+    
+    private void manejarCancelarReserva() {
+        // Obtener el ID de la reserva seleccionada en la tabla
+        int selectedRow = tblReservas.getSelectedRow();
+
+        if (selectedRow != -1) {
+            int reservaId = (int) tblReservas.getValueAt(selectedRow, 0); // Suponiendo que la columna 0 tiene el ID de la reserva
+            int habitacionId = (int) tblReservas.getValueAt(selectedRow, 2); // Suponiendo que la columna 2 tiene el ID de la habitación
+
+            int confirmation = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas cancelar esta reserva?", "Confirmar Cancelación", JOptionPane.YES_NO_OPTION);
+
+            if (confirmation == JOptionPane.YES_OPTION) {
+                cancelarReserva(reservaId, habitacionId);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione una reserva para cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -789,8 +827,6 @@ public class Main_Hotel extends javax.swing.JFrame {
         lblOcupacion = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         btnReporteHabitaciones = new javax.swing.JButton();
-        jdcPrimerFecha = new com.toedter.calendar.JDateChooser();
-        jdcSegundaFecha = new com.toedter.calendar.JDateChooser();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCheckin = new javax.swing.JTable();
@@ -1043,6 +1079,11 @@ public class Main_Hotel extends javax.swing.JFrame {
 
         btnModificarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/contrato.png"))); // NOI18N
         btnModificarReserva.setText(" Modificar");
+        btnModificarReserva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModificarReservaActionPerformed(evt);
+            }
+        });
 
         btnCancelarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/cancelar.png"))); // NOI18N
         btnCancelarReserva.setText(" Cancelar");
@@ -1119,29 +1160,18 @@ public class Main_Hotel extends javax.swing.JFrame {
             }
         });
 
-        jdcPrimerFecha.setDateFormatString("y-MM-dd");
-
-        jdcSegundaFecha.setDateFormatString("y-MM-dd");
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(54, 54, 54)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(84, 84, 84)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
-                        .addGap(46, 46, 46))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)))
+                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                .addGap(46, 46, 46)
                 .addComponent(btnReporteHabitaciones)
-                .addContainerGap(316, Short.MAX_VALUE))
+                .addContainerGap(317, Short.MAX_VALUE))
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel5Layout.createSequentialGroup()
                     .addGap(64, 64, 64)
@@ -1161,15 +1191,11 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addGap(175, 175, 175)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(194, 194, 194)
                         .addComponent(btnReporteHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(357, Short.MAX_VALUE))
+                .addContainerGap(358, Short.MAX_VALUE))
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel5Layout.createSequentialGroup()
                     .addGap(60, 60, 60)
@@ -1414,7 +1440,7 @@ public class Main_Hotel extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuscarCheckoutActionPerformed
 
     private void btnAgregarHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarHabitacionesActionPerformed
-        HabitacionesAddModify addHabitacion = new HabitacionesAddModify(this, true, false);
+       HabitacionesAddModify addHabitacion = new HabitacionesAddModify(this, true, false);
         addHabitacion.setVisible(true);
         if(addHabitacion.getRootPane() == null)
         return;
@@ -1507,7 +1533,7 @@ public class Main_Hotel extends javax.swing.JFrame {
 
     private void btnCancelarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarReservaActionPerformed
         // TODO add your handling code here:
-        cancelar_reservas();
+        manejarCancelarReserva();
 
     }//GEN-LAST:event_btnCancelarReservaActionPerformed
 
@@ -1548,17 +1574,16 @@ public class Main_Hotel extends javax.swing.JFrame {
        Date fecha2 = jdcSegundaFecha.getDate();   
               //validacion de que las fechas es correcta y no haya ningun error con ella
         try {
-            
+            if (fecha1.after(fecha2)) {
+                JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
+                return;
+            }
             if (fecha1==null) {
                 JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha valida");
                 return;
             }
             if (fecha2==null) {
                 JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha valida");
-                return;
-            }
-            if (fecha1.after(fecha2)) {
-                JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
                 return;
             }
         } catch (HeadlessException e) {
@@ -1582,6 +1607,11 @@ public class Main_Hotel extends javax.swing.JFrame {
          reporte.llenarTablaOcupadasLimpieza(fecha1Corregida, fecha2Corregida);
          reporte.setVisible(true); 
     }//GEN-LAST:event_btnReporteHabitacionesActionPerformed
+
+    private void btnModificarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarReservaActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_btnModificarReservaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1654,8 +1684,6 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private com.toedter.calendar.JDateChooser jdcPrimerFecha;
-    private com.toedter.calendar.JDateChooser jdcSegundaFecha;
     private javax.swing.JLabel jlHabitaciones;
     private javax.swing.JTextField jtBuscarHabitaciones;
     private javax.swing.JLabel lblAdministracionClientes;
