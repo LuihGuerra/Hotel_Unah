@@ -13,7 +13,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-
+import java.util.Date;
+import hotel_unah.reporteHabitaciones.reporteHabitaciones;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -624,12 +625,13 @@ public class Main_Hotel extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jTable5 = new javax.swing.JTable();
-        jButton13 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
-        jButton15 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
+        jdcPrimerFecha = new com.toedter.calendar.JDateChooser();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jdcSegundaFecha = new com.toedter.calendar.JDateChooser();
+        btnReporteHabitaciones = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCheckin = new javax.swing.JTable();
@@ -884,65 +886,69 @@ public class Main_Hotel extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Gestión de Reservas", jPanel3);
 
-        jTable5.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane5.setViewportView(jTable5);
-
-        jButton13.setText("Nuevo");
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
-            }
-        });
-
-        jButton14.setText("Modificar");
-
-        jButton15.setText("Eliminar");
-
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel5.setText("Informes y Reportes ");
+
+        jLabel1.setText("Primer Fecha");
+
+        jLabel8.setText("Segunda Fecha");
+
+        jLabel9.setText("Reportes de Ocupacion");
+
+        btnReporteHabitaciones.setText("Generar Reporte");
+        btnReporteHabitaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteHabitacionesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane5))
-                .addGap(70, 70, 70)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(343, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(40, 40, 40)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(35, 35, 35)
+                                        .addComponent(btnReporteHabitaciones))
+                                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(52, 52, 52))
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(175, 175, 175)
-                .addComponent(jButton13)
-                .addGap(18, 18, 18)
-                .addComponent(jButton14)
-                .addGap(18, 18, 18)
-                .addComponent(jButton15)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addComponent(jLabel9)
+                            .addGap(19, 19, 19)
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel8))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(63, 63, 63)
+                        .addComponent(btnReporteHabitaciones)))
+                .addContainerGap(379, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Informes y Reportes", jPanel5);
@@ -1092,10 +1098,6 @@ public class Main_Hotel extends javax.swing.JFrame {
        
     }//GEN-LAST:event_formWindowOpened
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton13ActionPerformed
-
     private void btnClientesNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesNuevoActionPerformed
         //Administarcions de Clientes     
         ingresar_nuevo_cliente();   
@@ -1152,6 +1154,57 @@ public class Main_Hotel extends javax.swing.JFrame {
          buscar.comprobarCheckout(txtBuscarCkeckout, tblCheckout);
     }//GEN-LAST:event_btnBuscarCheckoutActionPerformed
 
+    private void btnReporteHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteHabitacionesActionPerformed
+           // Reporte de Habitaciones
+    
+    // seleccionar la fecha y ponerla como java.util.Date;
+    Date fecha1 = jdcPrimerFecha.getDate();
+    Date fecha2 = jdcSegundaFecha.getDate();
+    
+    // validación de que las fechas son correctas y no haya ningún error con ella
+    try {
+        if (fecha1.after(fecha2)) {
+            JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
+            return;
+        }
+
+        if (fecha1 == null) {
+            JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+            return;
+        }
+
+        if (fecha2 == null) {
+            JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+            return;
+        }
+    } catch (HeadlessException e) {
+        JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha válida");
+        return;
+    }
+    
+    // cambiarle el formato
+    long d1 = fecha1.getTime();
+    long d2 = fecha2.getTime();
+    
+    // cambiarla a java.sql.Date; para que tenga el mismo formato que la fecha en la base de datos
+    java.sql.Date fecha1Corregida = new java.sql.Date(d1);
+    java.sql.Date fecha2Corregida = new java.sql.Date(d2);
+    
+    reporteHabitaciones reporte = new reporteHabitaciones(this, true);
+    
+    // verificar que haya algo de ocupación en las reservas, es decir si las habitaciones estuvieron ocupadas en ese tiempo
+    if (reporte.validarReservaciones(fecha1Corregida, fecha2Corregida) == 1) {
+        // muestra el reporte de la ocupación de las habitaciones
+        reporte.llenarTablaOcupadasLimpieza(fecha1Corregida, fecha2Corregida);
+        reporte.setVisible(true);
+    } else {
+        reporte.llenarTablaOcupadasLimpieza(fecha1Corregida, fecha2Corregida);
+        reporte.setVisible(true);
+    }
+        
+        
+    }//GEN-LAST:event_btnReporteHabitacionesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1194,23 +1247,24 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JButton btnClientesEliminar;
     private javax.swing.JButton btnClientesModificar;
     private javax.swing.JButton btnClientesNuevo;
+    private javax.swing.JButton btnReporteHabitaciones;
     private javax.swing.JButton btnResetTable;
     private javax.swing.JComboBox<String> comboBusquedaClientes;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1220,12 +1274,12 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
-    private javax.swing.JTable jTable5;
+    private com.toedter.calendar.JDateChooser jdcPrimerFecha;
+    private com.toedter.calendar.JDateChooser jdcSegundaFecha;
     private javax.swing.JLabel lblAdministracionClientes;
     private javax.swing.JLabel lblBCheckout;
     private javax.swing.JLabel lblBCheckout1;
