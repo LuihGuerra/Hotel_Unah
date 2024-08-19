@@ -11,23 +11,39 @@ import java.sql.SQLException;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-
+import com.toedter.calendar.JDateChooser;
 /**
  *
  * @author Lizy Bustillo
  */
 public class Gestion_Reservas extends javax.swing.JDialog {
-    DefaultComboBoxModel modelo;
-    private final  Main_Hotel mainHotel;
+    DefaultComboBoxModel<String> modelo;
+    private final Main_Hotel mainHotel;
+    private JDateChooser jDateChooserEntrada;
+    private JDateChooser jDateChooserSalida;
+
+    private int reservaId;
     /**
      * Creates new form Gestion_Reservas_Dialog
      */
+    public Gestion_Reservas(java.awt.Frame parent, boolean modal,Main_Hotel mainHotel,int clienteId, int habitacionId,Date fechaEntrada,Date fechaSalida,String estado) {
+        super(parent, modal);
+        this.mainHotel = mainHotel;
+        this.reservaId = reservaId; 
+        initComponents();
+        cbxClientes.setSelectedItem(String.valueOf(clienteId));
+        cbxHabitaciones.setSelectedItem(String.valueOf(habitacionId));
+        jDateChooserEntrada.setDate(fechaEntrada);
+        jDateChooserSalida.setDate(fechaSalida);
+        cbxEstado.setSelectedItem(estado);
+    }
     public Gestion_Reservas(java.awt.Frame parent, boolean modal,Main_Hotel mainHotel) {
         super(parent, modal);
-       
         this.mainHotel = mainHotel;
-         initComponents();
+        initComponents();
+        
     }
+       
     
     private void cargarClientesEnComboBox() {
     Connection conexion = null;
@@ -42,10 +58,8 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         ps = conexion.prepareStatement(sql);
         rs = ps.executeQuery();
 
-        // Limpiar el ComboBox antes de agregar nuevos elementos
         cbxClientes.removeAllItems();
-        
-        // Agregar un elemento placeholder opcional
+
         cbxClientes.addItem("Seleccione una opcion");
 
         while (rs.next()) {
@@ -79,10 +93,8 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         ps = conexion.prepareStatement(sql);
         rs = ps.executeQuery();
 
-        // Limpiar el ComboBox antes de agregar nuevos elementos
         cbxHabitaciones.removeAllItems();
         
-        // Agregar un elemento placeholder opcional
         cbxHabitaciones.addItem("Seleccione una opcion");
 
         while (rs.next()) {
@@ -103,32 +115,32 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     }
 }
 
-    private void guardarReserva() {
-    // Validar los campos antes de continuar
-    String clienteId = (String) cbxClientes.getSelectedItem();
-    String habitacionId = (String) cbxHabitaciones.getSelectedItem();
-    String estado = (String) cbxEstado.getSelectedItem();
+   private void guardarReserva() {
+    try {
+        int clienteId = Integer.parseInt((String) cbxClientes.getSelectedItem());
+        int habitacionId = Integer.parseInt((String) cbxHabitaciones.getSelectedItem());
+        java.sql.Date fechaEntrada = new java.sql.Date(jDateChooserEntrada.getDate().getTime());
+        java.sql.Date fechaSalida = new java.sql.Date(jDateChooserSalida.getDate().getTime());
+        String estado = (String) cbxEstado.getSelectedItem();
 
-    if (clienteId.equals("Seleccione una opcion") || habitacionId.equals("Seleccione una opcion") || estado.equals("Seleccione una opcion")) {
-        
-        JOptionPane.showMessageDialog(this, "Faltan datos por ingresar o selección inválida.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        return; 
+        Conexion conn = Conexion.getInstance();
+        Connection conexion = conn.conectar();
+        String sql = "UPDATE reservas SET cliente_id = ?, habitacion_id = ?, fecha_entrada = ?, fecha_salida = ?, estado = ? WHERE id = ?";
+        PreparedStatement pst = conexion.prepareStatement(sql);
+        pst.setInt(1, clienteId);
+        pst.setInt(2, habitacionId);
+        pst.setDate(3, fechaEntrada);
+        pst.setDate(4, fechaSalida);
+        pst.setString(5, estado);
+        pst.setInt(6, reservaId);
+
+        pst.executeUpdate();
+
+        JOptionPane.showMessageDialog(this, "Reserva modificada con éxito.");
+        dispose();
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Error al modificar la reserva: " + ex.getMessage());
     }
-
-    Date fechaSeleccionadaEntrada = fechaEnt.getDate();
-    Date fechaSeleccionadaSalida = fechaSal.getDate();
-
-    if (fechaSeleccionadaEntrada == null || fechaSeleccionadaSalida == null) {
-        JOptionPane.showMessageDialog(this, "Faltan fechas por ingresar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    java.sql.Date sqlDateEntrada = new java.sql.Date(fechaSeleccionadaEntrada.getTime());
-    java.sql.Date sqlDateSalida = new java.sql.Date(fechaSeleccionadaSalida.getTime());
-
-    mainHotel.agregarReserva(sqlDateEntrada, sqlDateSalida, Integer.parseInt(clienteId), Integer.parseInt(habitacionId), estado);
-
-    dispose();
 }
 
     /**
@@ -320,17 +332,21 @@ public class Gestion_Reservas extends javax.swing.JDialog {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
-        modelo = new DefaultComboBoxModel();
-       
-        modelo.addElement("Seleccione una opcion"); // O "Seleccione..." si prefieres un mensaje
-        modelo.addElement("Confirmada");
-        modelo.addElement("Pendiente");
-        modelo.addElement("Cancelada");
+       DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
 
-        // Establecer el modelo en el JComboBox
+     modelo.addElement("Seleccione una opción");
+     modelo.addElement("Confirmada");
+     modelo.addElement("Pendiente");
+     modelo.addElement("Cancelada");
+
+    if (cbxEstado != null) {
         cbxEstado.setModel(modelo);
-        cargarClientesEnComboBox();
-        cargarHabitacionesEnComboBox();
+    } else {
+        System.out.println("cbxEstado no está inicializado.");
+    }
+
+    cargarClientesEnComboBox();
+    cargarHabitacionesEnComboBox();
     }//GEN-LAST:event_formWindowOpened
 
     private void btnAgregarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarReservaActionPerformed
@@ -374,15 +390,21 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         /* Create and display the dialog */
             java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-            Main_Hotel mainHotel = new Main_Hotel(); // Instancia de AdministracionClientes
-            Gestion_Reservas dialog = new Gestion_Reservas(new javax.swing.JFrame(), true, mainHotel); // Pasa la instancia aquí
-            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    System.exit(0);
-                }
-            });
-            dialog.setVisible(true);
+            Main_Hotel mainHotel = new Main_Hotel(); 
+            int reservaId = 0; 
+            int clienteId = 0; 
+            Date fechaEntrada = new Date(); 
+            Date fechaSalida = new Date(); 
+            String estado = "confirmada"; 
+    
+    Gestion_Reservas dialog = new Gestion_Reservas(new javax.swing.JFrame(), true, mainHotel, reservaId, clienteId, fechaEntrada, fechaSalida, estado);
+    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e) {
+            System.exit(0);
+        }
+    });
+    dialog.setVisible(true);
         }
     });
     }
