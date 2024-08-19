@@ -715,15 +715,7 @@ public class Main_Hotel extends javax.swing.JFrame {
     DefaultTableModel model = (DefaultTableModel) tblReservas.getModel();
     model.addRow(new Object[]{null, null, null, fechaEntradaFormateada, fechaSalidaFormateada, null});
     }
-    
-    /*-------------------------------------------------------------------------
-                                    MODIFICAR
-    -------------------------------------------------------------------------*/
-   
-
-
-
-    
+        
 /*-------------------------------------------------------------------------
                                     DELETE
     -------------------------------------------------------------------------*/
@@ -781,8 +773,7 @@ public class Main_Hotel extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, seleccione una reserva para cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1611,6 +1602,21 @@ public class Main_Hotel extends javax.swing.JFrame {
 
     private void btnModificarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarReservaActionPerformed
         // TODO add your handling code here:
+         int filaSeleccionada = tblReservas.getSelectedRow();
+        
+        if (filaSeleccionada != -1) {
+        int clienteId = (int) tblReservas.getValueAt(filaSeleccionada, 1);
+        int habitacionId = (int) tblReservas.getValueAt(filaSeleccionada, 2);
+        java.sql.Date fechaEntrada = (java.sql.Date) tblReservas.getValueAt(filaSeleccionada, 3);
+        java.sql.Date fechaSalida = (java.sql.Date) tblReservas.getValueAt(filaSeleccionada, 4);
+        String estado = (String) tblReservas.getValueAt(filaSeleccionada, 5);
+        Gestion_Reservas gestionReservas = new Gestion_Reservas(this, true, this, clienteId, habitacionId, fechaEntrada, fechaSalida, estado);
+        gestionReservas.setVisible(true);
+    } else 
+    {
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione una reserva para modificar.");
+    }
+        
         
     }//GEN-LAST:event_btnModificarReservaActionPerformed
 
