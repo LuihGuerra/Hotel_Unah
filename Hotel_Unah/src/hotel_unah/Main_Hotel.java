@@ -1574,16 +1574,17 @@ public class Main_Hotel extends javax.swing.JFrame {
        Date fecha2 = jdcSegundaFecha.getDate();   
               //validacion de que las fechas es correcta y no haya ningun error con ella
         try {
-            if (fecha1.after(fecha2)) {
-                JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
-                return;
-            }
+            
             if (fecha1==null) {
                 JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha valida");
                 return;
             }
             if (fecha2==null) {
                 JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha valida");
+                return;
+            }
+            if (fecha1.after(fecha2)) {
+                JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");
                 return;
             }
         } catch (HeadlessException e) {
