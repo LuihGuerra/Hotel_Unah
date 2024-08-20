@@ -805,7 +805,6 @@ public class Main_Hotel extends javax.swing.JFrame {
         btnAgregarHabitaciones = new javax.swing.JButton();
         btnModificarHabitaciones = new javax.swing.JButton();
         btnEliminarHabitaciones = new javax.swing.JButton();
-        btRegresar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -821,8 +820,8 @@ public class Main_Hotel extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         btnReporteHabitaciones = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jdcFechaI = new com.toedter.calendar.JDateChooser();
-        jdcFechaF = new com.toedter.calendar.JDateChooser();
+        jdcPrimerFecha = new com.toedter.calendar.JDateChooser();
+        jdcSegundaFecha = new com.toedter.calendar.JDateChooser();
         btnReporteGanacias = new javax.swing.JToggleButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -1014,7 +1013,7 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlHabitaciones)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jtBuscarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnBuscarHabitaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addGap(18, 18, 18)
@@ -1031,7 +1030,7 @@ public class Main_Hotel extends javax.swing.JFrame {
                 .addComponent(jlHabitaciones)
                 .addGap(43, 43, 43)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtBuscarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBuscarHabitaciones))
                 .addGap(34, 34, 34)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1176,14 +1175,14 @@ public class Main_Hotel extends javax.swing.JFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jdcFechaI, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(48, 48, 48)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
                                 .addGap(46, 46, 46))
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jdcFechaF, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(36, 36, 36)))
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnReporteHabitaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1218,8 +1217,8 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jdcFechaF, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addComponent(jdcFechaI, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                         .addGap(63, 63, 63)
                         .addComponent(btnReporteGanacias, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1748,8 +1747,8 @@ public class Main_Hotel extends javax.swing.JFrame {
     private void btnReporteGanaciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteGanaciasActionPerformed
         
         try{            
-            Date fechaInicial = jdcFechaI.getDate();
-            Date fechaFinal = jdcFechaF.getDate();   
+            Date fechaInicial = jdcPrimerFecha.getDate();
+            Date fechaFinal = jdcSegundaFecha.getDate();   
             
             if (fechaInicial==null) {
                 JOptionPane.showMessageDialog(null, "Por Favor seleccione una fecha valida");
@@ -1816,7 +1815,6 @@ public class Main_Hotel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btRegresar;
     private javax.swing.JButton btnAgregarHabitaciones;
     private javax.swing.JButton btnBuscarCheckin;
     private javax.swing.JButton btnBuscarCheckout;
@@ -1854,10 +1852,10 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private com.toedter.calendar.JDateChooser jdcFechaF;
-    private com.toedter.calendar.JDateChooser jdcFechaI;
+    private com.toedter.calendar.JDateChooser jdcPrimerFecha;
+    private com.toedter.calendar.JDateChooser jdcSegundaFecha;
     private javax.swing.JLabel jlHabitaciones;
-    private javax.swing.JTextField jtBuscarHabitaciones;
+    private javax.swing.JTextField jtBuscar;
     private javax.swing.JLabel lblAdministracionClientes;
     private javax.swing.JLabel lblBCheckout;
     private javax.swing.JLabel lblOcupacion;
