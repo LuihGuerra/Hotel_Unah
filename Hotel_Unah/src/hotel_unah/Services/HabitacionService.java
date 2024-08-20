@@ -128,7 +128,7 @@ public class HabitacionService {
     Conexion conn = Conexion.getInstance();
     Connection con = conn.conectar();
     try {
-        PreparedStatement stmt = con.prepareStatement("SELECT EXISTS(SELECT id FROM reservas WHERE habitacion_id = ?) AS has_reservations");
+        PreparedStatement stmt = con.prepareStatement("SELECT EXISTS(SELECT id FROM reservas WHERE habitacion_id = ? and estado <> 'cancelada') AS has_reservations;");
         stmt.setInt(1, habitacionId);
         ResultSet rs = stmt.executeQuery();
         
