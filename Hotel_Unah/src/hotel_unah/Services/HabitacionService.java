@@ -124,31 +124,40 @@ public class HabitacionService {
     } 
     
     public Response DeleteHabitacion(int habitacionId){
-        Response result = new Response();
-        Conexion conn = Conexion.getInstance();
-            Connection con = conn.conectar();
-        try{
-            PreparedStatement stmt = con.prepareStatement("DELETE FROM Habitaciones WHERE id = ?");
-            stmt.setInt(1, habitacionId);
-            int rowsAffected  = stmt.executeUpdate();
-            
-            if(rowsAffected >= 0)
-            {
-               result.Success(true, "200", "Habitacion eliminada con exito");
-            }else{
-                result.Fault(true, "400", "Habitacion NO eliminada");
-            }
-            
-        }catch(SQLException ex){
-            result.Fault(true, "400", ex.getMessage());
-        } finally{
-            //se ejecuta siempre una vez haya finalizado todo lo del try
-            try{
-                con.close();
-            }catch(SQLException ex){
-               result.Fault(true, "500", ex.getMessage());
+    Response result = new Response();
+    Conexion conn = Conexion.getInstance();
+    Connection con = conn.conectar();
+    try {
+        PreparedStatement stmt = con.prepareStatement("SELECT EXISTS(SELECT id FROM reservas WHERE habitacion_id = ?) AS has_reservations");
+        stmt.setInt(1, habitacionId);
+        ResultSet rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            boolean hasReservations = rs.getBoolean("has_reservations");
+            if (hasReservations) {
+                result.Fault(true, "400", "No se puede eliminar esta habitación porque está reservada");
+            } else {
+                PreparedStatement smtt1 = con.prepareStatement("DELETE FROM Habitaciones WHERE id = ?");
+                smtt1.setInt(1, habitacionId);
+                int rowsAffected1 = smtt1.executeUpdate();
+
+                if (rowsAffected1 > 0) { 
+                    result.Success(true, "200", "Habitación eliminada con éxito");
+                } else {
+                    result.Fault(true, "400", "Habitación NO eliminada");
+                }
             }
         }
-        return result;
-    } 
+    } catch(SQLException ex) {
+        result.Fault(true, "400", ex.getMessage());
+    } finally {
+        try {
+            con.close();
+        } catch(SQLException ex) {
+            result.Fault(true, "500", ex.getMessage());
+        }
+    }
+    return result;
+}
+
 }
