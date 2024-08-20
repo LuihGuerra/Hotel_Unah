@@ -720,7 +720,70 @@ public class Main_Hotel extends javax.swing.JFrame {
                                     MODIFICAR
     -------------------------------------------------------------------------*/
    
-   
+    private void modificarFechaReserva() {
+        int filaSeleccionada = tblReservas.getSelectedRow();
+        if (filaSeleccionada >= 0) {
+            modificarFechaDialog modificarFechaDialog = new modificarFechaDialog(this, true);
+            modificarFechaDialog.setVisible(true);
+
+            Date nuevaFechaEntrada = modificarFechaDialog.getFechaEntrada();
+            Date nuevaFechaSalida = modificarFechaDialog.getFechaSalida();
+
+            if (nuevaFechaEntrada != null && nuevaFechaSalida != null) {
+                // Aquí debes actualizar las fechas en tu base de datos y en la tabla
+                String idReserva = tblReservas.getValueAt(filaSeleccionada, 0).toString();
+                actualizarReservaEnBD(idReserva, nuevaFechaEntrada, nuevaFechaSalida);
+                actualizar_tabla_reservas();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona una reserva.");
+        }
+    }
+    
+    //--------------------------------------------------------------
+    
+    private void actualizarReservaEnBD(String idReserva, Date nuevaFechaEntrada, Date nuevaFechaSalida) {
+    Connection conexion = null;
+    PreparedStatement ps = null;
+    
+    try {
+        // Establecer conexión utilizando tu clase Conexion
+        conexion = Conexion.getInstance().conectar();
+
+        // SQL para actualizar la reserva
+        String sql = "UPDATE reservas SET fecha_entrada = ?, fecha_salida = ? WHERE id = ?";
+        ps = conexion.prepareStatement(sql);
+
+        // Convertir las fechas de Date a java.sql.Date
+        java.sql.Date sqlFechaEntrada = new java.sql.Date(nuevaFechaEntrada.getTime());
+        java.sql.Date sqlFechaSalida = new java.sql.Date(nuevaFechaSalida.getTime());
+
+        // Configurar los parámetros de la consulta
+        ps.setDate(1, sqlFechaEntrada);
+        ps.setDate(2, sqlFechaSalida);
+        ps.setString(3, idReserva);
+
+        // Ejecutar la actualización
+        int filasActualizadas = ps.executeUpdate();
+
+        if (filasActualizadas > 0) {
+            JOptionPane.showMessageDialog(this, "Reserva actualizada correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo actualizar la reserva.");
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al actualizar la reserva en la base de datos.");
+    } finally {
+        try {
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
 
 
 /*-------------------------------------------------------------------------
@@ -1860,7 +1923,7 @@ public class Main_Hotel extends javax.swing.JFrame {
 
     private void btnModificarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarReservaActionPerformed
         // TODO add your handling code here:
-         
+         modificarFechaReserva();
     }//GEN-LAST:event_btnModificarReservaActionPerformed
 
     private void btnResetTable1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTable1ActionPerformed
