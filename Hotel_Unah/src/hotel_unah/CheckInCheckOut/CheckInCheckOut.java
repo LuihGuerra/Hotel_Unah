@@ -194,7 +194,7 @@ public class CheckInCheckOut {
             Connection conexion = conn.conectar();
              
             //PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas WHERE id = '"+txtBuscarCkeckin.getText().trim()+"'");  
-            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=?"); 
+            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=? AND (reservas.estado = 'pendiente' OR reservas.estado = 'confirmada')"); 
             busqueda.setString(1, txtBuscarCkeckin.getText().trim());
             ResultSet consulta = busqueda.executeQuery();
                            
@@ -376,7 +376,7 @@ public class CheckInCheckOut {
             Conexion conn = Conexion.getInstance();
             Connection conexion= conn.conectar();
             
-            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=? AND (reservas.estado = 'pendiente' OR reservas.estado = 'confirmada')"); 
+            PreparedStatement busqueda = conexion.prepareStatement("SELECT * FROM reservas INNER JOIN clientes ON reservas.cliente_id=clientes.id INNER JOIN habitaciones ON reservas.habitacion_id=habitaciones.id WHERE reservas.id=? "); 
             busqueda.setString(1, reservasId);
             ResultSet consulta = busqueda.executeQuery();
             
