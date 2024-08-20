@@ -123,11 +123,6 @@ public class HabitacionService {
         return result;
     } 
     
-    
-    
-    
-    
-    
     public Response DeleteHabitacion(int habitacionId){
     Response result = new Response();
     Conexion conn = Conexion.getInstance();
