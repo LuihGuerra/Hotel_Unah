@@ -2,48 +2,33 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */  
+
 package hotel_unah;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-import com.toedter.calendar.JDateChooser;
+import java.sql.ResultSet;
+
 /**
  *
  * @author Lizy Bustillo
  */
 public class Gestion_Reservas extends javax.swing.JDialog {
-    DefaultComboBoxModel<String> modelo;
-    private final Main_Hotel mainHotel;
-    private JDateChooser jDateChooserEntrada;
-    private JDateChooser jDateChooserSalida;
-
-    private int reservaId;
+    DefaultComboBoxModel modelo;
+    private final  Main_Hotel mainHotel;
     /**
      * Creates new form Gestion_Reservas_Dialog
      */
-    public Gestion_Reservas(java.awt.Frame parent, boolean modal,Main_Hotel mainHotel,int clienteId, int habitacionId,Date fechaEntrada,Date fechaSalida,String estado) {
-        super(parent, modal);
-        this.mainHotel = mainHotel;
-        this.reservaId = reservaId; 
-        initComponents();
-        cbxClientes.setSelectedItem(String.valueOf(clienteId));
-        cbxHabitaciones.setSelectedItem(String.valueOf(habitacionId));
-        jDateChooserEntrada.setDate(fechaEntrada);
-        jDateChooserSalida.setDate(fechaSalida);
-        cbxEstado.setSelectedItem(estado);
-    }
     public Gestion_Reservas(java.awt.Frame parent, boolean modal,Main_Hotel mainHotel) {
         super(parent, modal);
-        this.mainHotel = mainHotel;
-        initComponents();
-        
-    }
        
+        this.mainHotel = mainHotel;
+         initComponents();
+    }
     
     private void cargarClientesEnComboBox() {
     Connection conexion = null;
@@ -58,8 +43,10 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         ps = conexion.prepareStatement(sql);
         rs = ps.executeQuery();
 
+        // Limpiar el ComboBox antes de agregar nuevos elementos
         cbxClientes.removeAllItems();
-
+        
+        // Agregar un elemento placeholder opcional
         cbxClientes.addItem("Seleccione una opcion");
 
         while (rs.next()) {
@@ -93,8 +80,10 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         ps = conexion.prepareStatement(sql);
         rs = ps.executeQuery();
 
+        // Limpiar el ComboBox antes de agregar nuevos elementos
         cbxHabitaciones.removeAllItems();
         
+        // Agregar un elemento placeholder opcional
         cbxHabitaciones.addItem("Seleccione una opcion");
 
         while (rs.next()) {
@@ -115,32 +104,32 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     }
 }
 
-   private void guardarReserva() {
-    try {
-        int clienteId = Integer.parseInt((String) cbxClientes.getSelectedItem());
-        int habitacionId = Integer.parseInt((String) cbxHabitaciones.getSelectedItem());
-        java.sql.Date fechaEntrada = new java.sql.Date(jDateChooserEntrada.getDate().getTime());
-        java.sql.Date fechaSalida = new java.sql.Date(jDateChooserSalida.getDate().getTime());
-        String estado = (String) cbxEstado.getSelectedItem();
+    private void guardarReserva() {
+    // Validar los campos antes de continuar
+    String clienteId = (String) cbxClientes.getSelectedItem();
+    String habitacionId = (String) cbxHabitaciones.getSelectedItem();
+    String estado = (String) cbxEstado.getSelectedItem();
 
-        Conexion conn = Conexion.getInstance();
-        Connection conexion = conn.conectar();
-        String sql = "UPDATE reservas SET cliente_id = ?, habitacion_id = ?, fecha_entrada = ?, fecha_salida = ?, estado = ? WHERE id = ?";
-        PreparedStatement pst = conexion.prepareStatement(sql);
-        pst.setInt(1, clienteId);
-        pst.setInt(2, habitacionId);
-        pst.setDate(3, fechaEntrada);
-        pst.setDate(4, fechaSalida);
-        pst.setString(5, estado);
-        pst.setInt(6, reservaId);
-
-        pst.executeUpdate();
-
-        JOptionPane.showMessageDialog(this, "Reserva modificada con éxito.");
-        dispose();
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Error al modificar la reserva: " + ex.getMessage());
+    if (clienteId.equals("Seleccione una opcion") || habitacionId.equals("Seleccione una opcion") || estado.equals("Seleccione una opcion")) {
+        
+        JOptionPane.showMessageDialog(this, "Faltan datos por ingresar o selección inválida.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return; 
     }
+
+    Date fechaSeleccionadaEntrada = fechaEnt.getDate();
+    Date fechaSeleccionadaSalida = fechaSal.getDate();
+
+    if (fechaSeleccionadaEntrada == null || fechaSeleccionadaSalida == null) {
+        JOptionPane.showMessageDialog(this, "Faltan fechas por ingresar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    java.sql.Date sqlDateEntrada = new java.sql.Date(fechaSeleccionadaEntrada.getTime());
+    java.sql.Date sqlDateSalida = new java.sql.Date(fechaSeleccionadaSalida.getTime());
+
+    mainHotel.agregarReserva(sqlDateEntrada, sqlDateSalida, Integer.parseInt(clienteId), Integer.parseInt(habitacionId), estado);
+
+    dispose();
 }
 
     /**
@@ -181,7 +170,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
 
         jLabel1.setFont(new java.awt.Font("Arial", 1, 22)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("DATOS DE RESERVA");
+        jLabel1.setText("Datos de Reserva");
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel4.setText("Cliente ID:");
@@ -194,7 +183,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
 
         cbxEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/calendario.png"))); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reserva (2).png"))); // NOI18N
 
         fechaEnt.setDecorationBordersVisible(true);
 
@@ -231,38 +220,41 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addComponent(jLabel2)
-                .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fechaEnt, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(44, 44, 44)
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fechaSal, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbxClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(26, 26, 26)
+                        .addComponent(jLabel2)
+                        .addGap(26, 26, 26)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel1))
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fechaEnt, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(44, 44, 44)
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fechaSal, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
+                                .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbxHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbxClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbxEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbxHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel7)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbxEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(34, 34, 34)
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel1))))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(260, 260, 260)
+                        .addGap(319, 319, 319)
                         .addComponent(btnAgregarReserva)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSalir)))
@@ -281,13 +273,13 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                         .addGap(57, 57, 57)
                         .addComponent(jLabel2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
+                        .addGap(26, 26, 26)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(17, 17, 17)
                                 .addComponent(jLabel1)))))
-                .addGap(27, 27, 27)
+                .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5)
@@ -301,11 +293,11 @@ public class Gestion_Reservas extends javax.swing.JDialog {
                     .addComponent(fechaEnt, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fechaSal, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAgregarReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(31, 31, 31))
+                .addGap(30, 30, 30))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(229, 229, 229)
@@ -332,21 +324,17 @@ public class Gestion_Reservas extends javax.swing.JDialog {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
-       DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        modelo = new DefaultComboBoxModel();
+       
+        modelo.addElement("Seleccione una opcion"); // O "Seleccione..." si prefieres un mensaje
+        modelo.addElement("Confirmada");
+        modelo.addElement("Pendiente");
+        modelo.addElement("Cancelada");
 
-     modelo.addElement("Seleccione una opción");
-     modelo.addElement("Confirmada");
-     modelo.addElement("Pendiente");
-     modelo.addElement("Cancelada");
-
-    if (cbxEstado != null) {
+        // Establecer el modelo en el JComboBox
         cbxEstado.setModel(modelo);
-    } else {
-        System.out.println("cbxEstado no está inicializado.");
-    }
-
-    cargarClientesEnComboBox();
-    cargarHabitacionesEnComboBox();
+        cargarClientesEnComboBox();
+        cargarHabitacionesEnComboBox();
     }//GEN-LAST:event_formWindowOpened
 
     private void btnAgregarReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarReservaActionPerformed
@@ -390,21 +378,15 @@ public class Gestion_Reservas extends javax.swing.JDialog {
         /* Create and display the dialog */
             java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-            Main_Hotel mainHotel = new Main_Hotel(); 
-            int reservaId = 0; 
-            int clienteId = 0; 
-            Date fechaEntrada = new Date(); 
-            Date fechaSalida = new Date(); 
-            String estado = "confirmada"; 
-    
-    Gestion_Reservas dialog = new Gestion_Reservas(new javax.swing.JFrame(), true, mainHotel, reservaId, clienteId, fechaEntrada, fechaSalida, estado);
-    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(java.awt.event.WindowEvent e) {
-            System.exit(0);
-        }
-    });
-    dialog.setVisible(true);
+            Main_Hotel mainHotel = new Main_Hotel(); // Instancia de AdministracionClientes
+            Gestion_Reservas dialog = new Gestion_Reservas(new javax.swing.JFrame(), true, mainHotel); // Pasa la instancia aquí
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
         }
     });
     }

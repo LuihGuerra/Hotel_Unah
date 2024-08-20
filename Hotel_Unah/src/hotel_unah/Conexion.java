@@ -28,7 +28,7 @@ public class Conexion {
     
     private static final String user = "root";
     
-    private static final String password = "";
+    private static final String password = "Lizyb123";
     
     //establecer conexion
     

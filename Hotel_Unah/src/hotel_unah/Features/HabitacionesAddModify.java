@@ -25,7 +25,7 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
         }
         else{
             jlAddModifyHabitacion.setText("Agregar Habitación");
-            btnAddModify.setText("Agregar");
+            btnAddModify.setText("Guardar");
         }
         
         isModify = modificacion;
@@ -83,7 +83,14 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
         btnAddModify = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 204, 255));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
+        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/Cancelar_Reserva.png"))); // NOI18N
         btnCancel.setText("Cancelar");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -91,25 +98,28 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
             }
         });
 
-        jlAddModifyHabitacion.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        jlAddModifyHabitacion.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+        jlAddModifyHabitacion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAddModifyHabitacion.setText("jLabel1");
+        jlAddModifyHabitacion.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jlNumeroHabitacion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jlNumeroHabitacion.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jlNumeroHabitacion.setText("Numero habitación");
 
         cbTipoHabitacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un tipo...", "Individual", "Doble", "Suite" }));
 
-        jlTipoHabitacion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jlTipoHabitacion.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jlTipoHabitacion.setText("Tipo habitación");
 
         cbEstadoHabitacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un estado...", "Disponible", "Ocupada", "En limpieza" }));
 
-        jlEstadoHabitacion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jlEstadoHabitacion.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jlEstadoHabitacion.setText("Estado habitación");
 
-        jlPrecioNoche.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jlPrecioNoche.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jlPrecioNoche.setText("Precio por noche");
 
+        btnAddModify.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/disquete.png"))); // NOI18N
         btnAddModify.setText("jButton1");
         btnAddModify.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -122,33 +132,40 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(190, 190, 190)
-                        .addComponent(jlAddModifyHabitacion))
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(33, 33, 33)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNumeroHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlNumeroHabitacion)
-                            .addComponent(jlEstadoHabitacion)
-                            .addComponent(cbEstadoHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(84, 84, 84)
-                                .addComponent(btnAddModify, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(42, 42, 42)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlTipoHabitacion)
-                            .addComponent(cbTipoHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPrecioNoche, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlPrecioNoche))))
+                                .addGap(89, 89, 89)
+                                .addComponent(btnAddModify, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42)
+                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtNumeroHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jlNumeroHabitacion))
+                                .addGap(42, 42, 42)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jlTipoHabitacion)
+                                    .addComponent(cbTipoHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbEstadoHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jlEstadoHabitacion))
+                                .addGap(42, 42, 42)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jlPrecioNoche)
+                                    .addComponent(txtPrecioNoche, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(224, 224, 224)
+                        .addComponent(jlAddModifyHabitacion)))
                 .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(14, 14, 14)
                 .addComponent(jlAddModifyHabitacion)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -156,23 +173,21 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
                     .addComponent(jlTipoHabitacion))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cbTipoHabitacion, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                    .addComponent(txtNumeroHabitacion))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(cbTipoHabitacion)
+                    .addComponent(txtNumeroHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlEstadoHabitacion)
+                    .addComponent(jlPrecioNoche))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jlEstadoHabitacion)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbEstadoHabitacion))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jlPrecioNoche)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPrecioNoche, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                    .addComponent(cbEstadoHabitacion)
+                    .addComponent(txtPrecioNoche, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(32, 32, 32)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnAddModify, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addGap(32, 32, 32))
         );
 
         pack();
@@ -230,6 +245,12 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
 
         }
     }//GEN-LAST:event_btnAddModifyActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        //Activar color de fondo
+        this.getContentPane().setBackground(this.getBackground());
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
