@@ -8,6 +8,7 @@ import hotel_unah.Features.HabitacionesAddModify;
 import hotel_unah.Models.Habitacion;
 import hotel_unah.Models.HabitacionEntity;
 import hotel_unah.Services.HabitacionService;
+import hotel_unah.reporteHabitaciones.ReportGanancia;
 
 import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
@@ -799,11 +800,12 @@ public class Main_Hotel extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         tbHabitaciones = new javax.swing.JTable();
         jlHabitaciones = new javax.swing.JLabel();
-        jtBuscarHabitaciones = new javax.swing.JTextField();
+        jtBuscar = new javax.swing.JTextField();
         btnBuscarHabitaciones = new javax.swing.JButton();
         btnAgregarHabitaciones = new javax.swing.JButton();
         btnModificarHabitaciones = new javax.swing.JButton();
         btnEliminarHabitaciones = new javax.swing.JButton();
+        btRegresar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -818,6 +820,14 @@ public class Main_Hotel extends javax.swing.JFrame {
         lblOcupacion = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         btnReporteHabitaciones = new javax.swing.JButton();
+        jdcPrimerFecha = new com.toedter.calendar.JDateChooser();
+        jdcSegundaFecha = new com.toedter.calendar.JDateChooser();
+        lblGanancia = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jdcFechaI = new com.toedter.calendar.JDateChooser();
+        jdcFechaF = new com.toedter.calendar.JDateChooser();
+        btnReporteGanacias = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCheckin = new javax.swing.JTable();
@@ -972,6 +982,11 @@ public class Main_Hotel extends javax.swing.JFrame {
         jlHabitaciones.setText("Habitaciones");
 
         btnBuscarHabitaciones.setText("Buscar");
+        btnBuscarHabitaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarHabitacionesActionPerformed(evt);
+            }
+        });
 
         btnAgregarHabitaciones.setText("Agregar");
         btnAgregarHabitaciones.addActionListener(new java.awt.event.ActionListener() {
@@ -994,6 +1009,13 @@ public class Main_Hotel extends javax.swing.JFrame {
             }
         });
 
+        btRegresar.setText("X");
+        btRegresar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRegresarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1008,14 +1030,16 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlHabitaciones)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jtBuscarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnBuscarHabitaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(btnModificarHabitaciones, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAgregarHabitaciones, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnEliminarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(btnModificarHabitaciones, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAgregarHabitaciones, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEliminarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(79, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -1025,8 +1049,9 @@ public class Main_Hotel extends javax.swing.JFrame {
                 .addComponent(jlHabitaciones)
                 .addGap(43, 43, 43)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtBuscarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBuscarHabitaciones))
+                    .addComponent(jtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuscarHabitaciones)
+                    .addComponent(btRegresar))
                 .addGap(34, 34, 34)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1036,7 +1061,7 @@ public class Main_Hotel extends javax.swing.JFrame {
                         .addComponent(btnModificarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnEliminarHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(152, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Administración de Habitaciones", jPanel2);
@@ -1070,11 +1095,6 @@ public class Main_Hotel extends javax.swing.JFrame {
 
         btnModificarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/contrato.png"))); // NOI18N
         btnModificarReserva.setText(" Modificar");
-        btnModificarReserva.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnModificarReservaActionPerformed(evt);
-            }
-        });
 
         btnCancelarReserva.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/cancelar.png"))); // NOI18N
         btnCancelarReserva.setText(" Cancelar");
@@ -1132,7 +1152,7 @@ public class Main_Hotel extends javax.swing.JFrame {
         jTabbedPane1.addTab("Gestión de Reservas", jPanel3);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setText("Primer Fecha");
+        jLabel5.setText("Fecha Final");
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel9.setText("Informes y Reportes ");
@@ -1151,18 +1171,66 @@ public class Main_Hotel extends javax.swing.JFrame {
             }
         });
 
+        jdcPrimerFecha.setDateFormatString("y-MM-dd");
+
+        jdcSegundaFecha.setDateFormatString("y-MM-dd");
+
+        lblGanancia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblGanancia.setText("Reporte de Ganancia");
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel10.setText("Primer Fecha");
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel12.setText("Fecha Inicial");
+
+        jdcFechaI.setDateFormatString("yyyy-MM-dd");
+
+        jdcFechaF.setDateFormatString("yyyy-MM-dd");
+
+        btnReporteGanacias.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnReporteGanacias.setText("Generar Reporte");
+        btnReporteGanacias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteGanaciasActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(54, 54, 54)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(84, 84, 84)
-                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-                .addGap(46, 46, 46)
-                .addComponent(btnReporteHabitaciones)
-                .addContainerGap(317, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(lblGanancia, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jdcFechaI, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(78, 78, 78)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                                        .addGap(46, 46, 46))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)))
+                                .addComponent(btnReporteHabitaciones))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jdcFechaF, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnReporteGanacias)))
+                        .addContainerGap(317, Short.MAX_VALUE))))
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel5Layout.createSequentialGroup()
                     .addGap(64, 64, 64)
@@ -1173,6 +1241,11 @@ public class Main_Hotel extends javax.swing.JFrame {
                     .addGap(64, 64, 64)
                     .addComponent(lblOcupacion, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(760, Short.MAX_VALUE)))
+            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGap(64, 64, 64)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGap(793, 793, 793)))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1180,13 +1253,28 @@ public class Main_Hotel extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(175, 175, 175)
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jdcSegundaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jdcPrimerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(194, 194, 194)
                         .addComponent(btnReporteHabitaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(358, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(lblGanancia, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jdcFechaI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jdcFechaF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnReporteGanacias, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(228, Short.MAX_VALUE))
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel5Layout.createSequentialGroup()
                     .addGap(60, 60, 60)
@@ -1197,6 +1285,11 @@ public class Main_Hotel extends javax.swing.JFrame {
                     .addGap(127, 127, 127)
                     .addComponent(lblOcupacion, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(434, Short.MAX_VALUE)))
+            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGap(185, 185, 185)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(376, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("Informes y Reportes", jPanel5);
@@ -1620,6 +1713,121 @@ public class Main_Hotel extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnModificarReservaActionPerformed
 
+    private void btnBuscarHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarHabitacionesActionPerformed
+        
+        Conexion conn = Conexion.getInstance();
+        Connection conexion = conn.conectar();
+        String txtnum = jtBuscar.getText();
+        
+        try{
+            
+            PreparedStatement consultar = conexion.prepareStatement("SELECT * FROM habitaciones WHERE numero_habitacion = ?");
+            consultar.setString(1, txtnum);
+            ResultSet hab = consultar.executeQuery();
+            
+            if(hab.next()){
+               JOptionPane.showMessageDialog(null, "La Habitacion se encontro");
+               
+               DefaultTableModel datos = new DefaultTableModel();
+               datos.addColumn("id");
+               datos.addColumn("numero_habitacion");
+               datos.addColumn("tipo");
+               datos.addColumn("estado");
+               datos.addColumn("precio_por_noche");
+            
+               tbHabitaciones.setModel(datos);
+            
+               Vector fila = new Vector();
+               fila.addElement(hab.getString(1));
+               fila.addElement(hab.getString(2));
+               fila.addElement(hab.getString(3)); 
+               fila.addElement(hab.getString(4));
+               fila.addElement(hab.getString(5));
+            
+               datos.addRow(fila);
+               conn.cerrarConexion();
+               
+            }else{
+                JOptionPane.showMessageDialog(null, "La Habitacion no se encontro");
+            }
+                        
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }finally{
+            try{
+                conn.cerrarConexion();
+            }catch(SQLException e){
+                JOptionPane.showConfirmDialog(null, e);
+            }
+        }
+        
+    }//GEN-LAST:event_btnBuscarHabitacionesActionPerformed
+
+    private void btRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegresarActionPerformed
+        
+        try{
+            Conexion conn = Conexion.getInstance();
+            Connection conexion =conn.conectar();
+        
+            PreparedStatement regreTa = conexion.prepareStatement("SELECT * FROM habitaciones");
+            ResultSet hab = regreTa.executeQuery();
+            
+            DefaultTableModel datos = new DefaultTableModel();
+            
+            datos.addColumn("id");
+            datos.addColumn("numero_habitacion");
+            datos.addColumn("tipo");
+            datos.addColumn("estado");
+            datos.addColumn("precio_por_noche");
+            
+            tbHabitaciones.setModel(datos);  
+            
+            while(hab.next()){
+                Vector fila = new Vector();
+               fila.addElement(hab.getString(1));
+               fila.addElement(hab.getString(2));
+               fila.addElement(hab.getString(3)); 
+               fila.addElement(hab.getString(4));
+               fila.addElement(hab.getString(5));
+            
+               datos.addRow(fila);
+            }
+            
+            conn.cerrarConexion();
+            
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+        
+    }//GEN-LAST:event_btRegresarActionPerformed
+
+    private void btnReporteGanaciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteGanaciasActionPerformed
+        
+        try{            
+            Date fechaInicial = jdcFechaI.getDate();
+            Date fechaFinal = jdcFechaF.getDate();   
+            
+            if (fechaFinal.before(fechaInicial)) {
+                JOptionPane.showMessageDialog(null, "La fecha final no puede ser menor a la inicial");     
+            }else{
+                
+                long fF = fechaInicial.getTime();
+                long fI = fechaFinal.getTime();
+                java.sql.Date fIn = new java.sql.Date(fF);
+                java.sql.Date fFi = new java.sql.Date(fI);
+        
+                ReportGanancia view = new ReportGanancia(this, true);
+                view.ReporteG(fIn, fFi);
+                view.calcularTotal(fIn, fFi);
+                view.setVisible(true);
+            }            
+            
+        }catch(HeadlessException e){
+            JOptionPane.showMessageDialog(null, "Valores Incorrectos");
+        }
+        
+    }//GEN-LAST:event_btnReporteGanaciasActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1656,6 +1864,7 @@ public class Main_Hotel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btRegresar;
     private javax.swing.JButton btnAgregarHabitaciones;
     private javax.swing.JButton btnBuscarCheckin;
     private javax.swing.JButton btnBuscarCheckout;
@@ -1669,11 +1878,14 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JButton btnModificarHabitaciones;
     private javax.swing.JButton btnModificarReserva;
     private javax.swing.JButton btnNuevaReserva;
+    private javax.swing.JButton btnReporteGanacias;
     private javax.swing.JButton btnReporteHabitaciones;
     private javax.swing.JButton btnResetTable;
     private javax.swing.JComboBox<String> comboBusquedaClientes;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1691,10 +1903,15 @@ public class Main_Hotel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private com.toedter.calendar.JDateChooser jdcFechaF;
+    private com.toedter.calendar.JDateChooser jdcFechaI;
+    private com.toedter.calendar.JDateChooser jdcPrimerFecha;
+    private com.toedter.calendar.JDateChooser jdcSegundaFecha;
     private javax.swing.JLabel jlHabitaciones;
-    private javax.swing.JTextField jtBuscarHabitaciones;
+    private javax.swing.JTextField jtBuscar;
     private javax.swing.JLabel lblAdministracionClientes;
     private javax.swing.JLabel lblBCheckout;
+    private javax.swing.JLabel lblGanancia;
     private javax.swing.JLabel lblOcupacion;
     private javax.swing.JTable tbHabitaciones;
     private javax.swing.JTable tblCheckin;
