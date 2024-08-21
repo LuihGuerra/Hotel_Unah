@@ -4,7 +4,7 @@
  */
 package hotel_unah.CheckInCheckOut;
 
-import com.mysql.cj.protocol.Resultset;
+
 import hotel_unah.Conexion;
 import java.awt.HeadlessException;
 import java.sql.Connection;
