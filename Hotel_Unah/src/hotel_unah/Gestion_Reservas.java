@@ -12,6 +12,7 @@ import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import java.util.Date;
 
 /**
  *
@@ -104,7 +105,7 @@ public class Gestion_Reservas extends javax.swing.JDialog {
     }
 }
 
-    private void guardarReserva() {
+   private void guardarReserva() {
     // Validar los campos antes de continuar
     String clienteId = (String) cbxClientes.getSelectedItem();
     String habitacionId = (String) cbxHabitaciones.getSelectedItem();
@@ -121,6 +122,15 @@ public class Gestion_Reservas extends javax.swing.JDialog {
 
     if (fechaSeleccionadaEntrada == null || fechaSeleccionadaSalida == null) {
         JOptionPane.showMessageDialog(this, "Faltan fechas por ingresar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    if (fechaSeleccionadaEntrada.before(new Date(124, 0, 1))) { // 1 de enero de 2024
+        JOptionPane.showMessageDialog(this, "La fecha de entrada no puede ser antes del 1 de enero de 2024.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (fechaSeleccionadaSalida.before(fechaSeleccionadaEntrada)) {
+        JOptionPane.showMessageDialog(this, "La fecha de salida no puede ser antes que la fecha de entrada.", "Advertencia", JOptionPane.WARNING_MESSAGE);
         return;
     }
 

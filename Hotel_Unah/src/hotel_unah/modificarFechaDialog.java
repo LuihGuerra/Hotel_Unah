@@ -24,6 +24,16 @@ public class modificarFechaDialog extends javax.swing.JDialog {
     private void guardarFechas() {
         Date nuevaFechaEntrada = fechaEntradaChooser.getDate();
         Date nuevaFechaSalida = fechaSalidaChooser.getDate();
+        if (nuevaFechaEntrada.before(new Date(124, 0, 1))) { 
+            JOptionPane.showMessageDialog(this, "La fecha de entrada no puede ser antes del 1 de enero de 2024.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+
+        if (nuevaFechaSalida.before(nuevaFechaEntrada)) {
+            JOptionPane.showMessageDialog(this, "La fecha de salida no puede ser antes que la fecha de entrada.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         if (nuevaFechaEntrada != null && nuevaFechaSalida != null) {
             // Aquí puedes realizar la actualización en la base de datos o en la tabla

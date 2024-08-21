@@ -724,8 +724,9 @@ public class Main_Hotel extends javax.swing.JFrame {
         int filaSeleccionada = tblReservas.getSelectedRow();
         if (filaSeleccionada >= 0) {
             modificarFechaDialog modificarFechaDialog = new modificarFechaDialog(this, true);
-            modificarFechaDialog.setVisible(true);
-
+             modificarFechaDialog.setVisible(true);
+            if(modificarFechadialog.getRootPane()==null) return;
+                
             Date nuevaFechaEntrada = modificarFechaDialog.getFechaEntrada();
             Date nuevaFechaSalida = modificarFechaDialog.getFechaSalida();
 
