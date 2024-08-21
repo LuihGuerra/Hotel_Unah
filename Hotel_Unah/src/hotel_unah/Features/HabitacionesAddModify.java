@@ -82,7 +82,7 @@ public class HabitacionesAddModify extends javax.swing.JDialog {
         jlPrecioNoche = new javax.swing.JLabel();
         btnAddModify = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 255));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
