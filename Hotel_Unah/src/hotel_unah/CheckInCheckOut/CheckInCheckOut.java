@@ -148,7 +148,7 @@ public class CheckInCheckOut {
                     PreparedStatement insertar = conexion.prepareStatement("INSERT INTO checkins( reserva_id, fecha_checkin) VALUES (?,CURRENT_TIMESTAMP())"); 
                     insertar.setString(1, reservaId);
                     insertar.executeUpdate();
-                    JOptionPane.showMessageDialog(null, "Checkin Realizado con Exito");
+                    
                     actualizarCheckIn(tblCheckin);
                     conn.cerrarConexion();
                     
@@ -233,7 +233,7 @@ public class CheckInCheckOut {
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, opciones2, opciones2[1]);
                         if (respuesta2 == 0) {
                             //Proceder con el ckeckin
-                            JOptionPane.showMessageDialog(null, "Checkin Hecho");
+                            JOptionPane.showMessageDialog(null, "Checkin Realizado con Exito");
                             this.checkin(consulta.getString(1),consulta.getString(4),consulta.getString(5), tblCheckin);
                             this.cambiarEstadoHabitacion(consulta.getString(3));
                             this.cambiarEstadoReserva(consulta.getString(1));
